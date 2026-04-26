@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Welcome to Readbond')
+@section('title', 'Readbond - Welcome to Readbond')
 
 @section('content')
     <!-- Hero Section -->

@@ -43,7 +43,7 @@
                                     <p class="text-sm text-white truncate">{{ Auth::user()->username }}</p>
                                 </div>
 
-                                <a href="/profile" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">My Profile</a>
+                                <a href="{{ route('profile', ['user' => auth()->user()->username]) }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">My Profile</a>
                                 <a href="/settings" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Settings</a>
                                 
                                 <form action="{{ route('logout') }}" method="POST">
@@ -89,7 +89,7 @@
             <x-responsive-nav-link href="/books" :active="request()->is('books*')">Books</x-responsive-nav-link>
             <x-responsive-nav-link href="/collection" :active="request()->is('collection*')">Collection</x-responsive-nav-link>
             @auth
-                <x-responsive-nav-link href="/profile" :active="request()->is('profile*')">My Profile</x-responsive-nav-link>
+                <x-responsive-nav-link href="{{ route('profile', ['user' => auth()->user()->username]) }}" :active="request()->is('profile*')">My Profile</x-responsive-nav-link>
             @endauth
         </div>
 
