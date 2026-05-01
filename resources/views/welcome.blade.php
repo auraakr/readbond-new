@@ -98,13 +98,13 @@
 
     <!-- Features Section -->
     <section>
-        <div class="rb-features-wrap">
-            <div style="max-width:1200px;margin:0 auto;padding:64px 24px 0;">
+        <div class="rb-features-wrap py-20 px-6 lg:px-32">
+            <div style="max-width:1200px;margin:0 auto;">
                 <p class="rb-section-label">Features</p>
                 <h2 class="rb-section-title" style="margin-bottom:4px;">Everything You Need</h2>
                 <p class="rb-section-sub" style="margin-bottom:48px;">All in one beautiful platform</p>
             </div>
-            <div style="max-width:1200px;margin:0 auto;padding:0 24px 64px;">
+            <div style="max-width:1200px;margin:0 auto;">
                 <div class="rb-features-grid">
     
                     <div class="rb-feature-item">
@@ -162,7 +162,7 @@
 
     <!-- Social Proof Section -->
     <section>
-        <div class="rb-section">
+        <div class="rb-section py-20 px-6 lg:px-32">
             <p class="rb-section-label">Testimonials</p>
             <h2 class="rb-section-title" style="margin-bottom:40px;">What Readers Say</h2>
     
