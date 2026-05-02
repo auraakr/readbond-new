@@ -14,7 +14,7 @@
             <div class="hidden sm:flex sm:items-center sm:gap-6">
                 <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
                 <x-nav-link href="/books" :active="request()->is('books*')">Books</x-nav-link>
-                <x-nav-link href="/collection" :active="request()->is('collection*')">Collection</x-nav-link>
+                <x-nav-link href="/collections" :active="request()->is('collection*')">Collection</x-nav-link>
                 <x-nav-link href="/friends" :active="request()->is('friends*')">Friends</x-nav-link>
                 
                 <div class="h-6 w-[1px] bg-slate-700 mx-2"></div>

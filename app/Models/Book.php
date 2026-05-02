@@ -11,13 +11,20 @@ class Book extends Model
 
     // Atribut yang boleh diisi (Mass Assignment)
     protected $fillable = [
+        'external_id',
         'title',
         'desc',
         'author_id',
+        'author_name', 
         'year',
         'cover',
+        'subject',
         'pageCount',
         'averageRating',
+    ];
+
+    protected $casts = [
+        'subject' => 'array',
     ];
 
     public function getBookDetails(): void
