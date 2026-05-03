@@ -87,15 +87,18 @@ class BooksController extends Controller
 
         $results = Http::get('https://openlibrary.org/search.json', [
             'q'      => $q,
-            'fields' => 'key,title,author_name,cover_i', // ✅ tambah key
+            'fields' => 'key,title,author_name,cover_i', // ✅ pastikan key ada
             'limit'  => 6,
         ])->json()['docs'] ?? [];
 
         return response()->json(collect($results)->map(fn($b) => [
-            'title'  => $b['title'],
-            'author' => $b['author_name'][0] ?? 'Unknown',
-            'cover'  => isset($b['cover_i']) ? "https://covers.openlibrary.org/b/id/{$b['cover_i']}-S.jpg" : null,
-            'url'    => route('books.show', str_replace('/works/', '', $b['key'])), // ✅ langsung generate URL
+            'external_id' => str_replace('/works/', '', $b['key']), // ✅ ini yang hilang
+            'title'       => $b['title'],
+            'author'      => $b['author_name'][0] ?? 'Unknown',
+            'cover'       => isset($b['cover_i'])
+                            ? "https://covers.openlibrary.org/b/id/{$b['cover_i']}-S.jpg"
+                            : null,
+            'url'         => route('books.show', str_replace('/works/', '', $b['key'])),
         ]));
     }
 }

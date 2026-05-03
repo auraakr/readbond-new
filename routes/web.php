@@ -17,17 +17,13 @@ Route::get('/books', [BooksController::class, 'index'])->name('books');
 Route::get('/books/autocomplete', [BooksController::class, 'autocomplete'])->name('books.autocomplete');
 Route::get('/books/{external_id}', [BooksController::class, 'show'])->name('books.show');
 
-Route::get('/collections', [CollectionController::class, 'index'])->name('collections.index');
-Route::get('/collections/create', [CollectionController::class, 'create'])->name('collections.create');
-Route::get('/collections/{id}', [CollectionController::class, 'show'])->name('collections.show');
-
 Route::prefix('collections')->name('collections.')->group(function () {
+    // PUBLIC routes
     Route::get('/',           [CollectionController::class, 'index'])->name('index');
-    Route::get('/create',     [CollectionController::class, 'create'])->name('create');
-    Route::get('/{id}',       [CollectionController::class, 'show'])->name('show');
 
-    // Routes berikut butuh login
+    // PROTECTED routes (butuh login)
     Route::middleware('auth')->group(function () {
+        Route::get('/create',                     [CollectionController::class, 'create'])->name('create');
         Route::post('/',                          [CollectionController::class, 'store'])->name('store');
         Route::delete('/{id}',                    [CollectionController::class, 'destroy'])->name('destroy');
         Route::post('/{id}/like',                 [CollectionController::class, 'toggleLike'])->name('like');
@@ -37,6 +33,9 @@ Route::prefix('collections')->name('collections.')->group(function () {
         Route::post('/{id}/books/add',            [CollectionController::class, 'addBook'])->name('books.add');
         Route::post('/{id}/books/remove',         [CollectionController::class, 'removeBook'])->name('books.remove');
     });
+
+    // PUBLIC routes (ditaruh paling bawah)
+    Route::get('/{id}',       [CollectionController::class, 'show'])->name('show');
 });
 
 Route::middleware('guest')->group(function () {

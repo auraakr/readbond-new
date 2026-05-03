@@ -210,31 +210,31 @@ document.addEventListener('click', e => {
     }
 });
 
+// GANTI addBook — cek duplikat pakai external_id
 function addBook(book) {
-    // Cegah duplikat — pakai title sebagai key karena autocomplete tidak return id DB
-    if (selectedBooks.find(b => b.title === book.title)) {
+    if (selectedBooks.find(b => b.external_id === book.external_id)) {
         bookSearchResults.classList.add('hidden');
         bookSearchInput.value = '';
         return;
     }
-
     selectedBooks.push(book);
     renderSelected();
     bookSearchResults.classList.add('hidden');
     bookSearchInput.value = '';
 }
 
-function removeBook(title) {
-    selectedBooks = selectedBooks.filter(b => b.title !== title);
+// GANTI removeBook — hapus pakai external_id
+function removeBook(externalId) {
+    selectedBooks = selectedBooks.filter(b => b.external_id !== externalId);
     renderSelected();
 }
 
+// GANTI renderSelected — hidden input pakai book_external_ids[]
 function renderSelected() {
     emptyBooksEl.classList.toggle('hidden', selectedBooks.length > 0);
 
-    selectedBooksEl.innerHTML = selectedBooks.map((b, i) => `
-        <div class="flex items-center gap-3 bg-slate-900 border border-slate-700
-                    rounded-xl px-4 py-3 group">
+    selectedBooksEl.innerHTML = selectedBooks.map(b => `
+        <div class="flex items-center gap-3 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3">
             ${b.cover
                 ? `<img src="${b.cover}" class="w-8 h-11 object-cover rounded shrink-0">`
                 : `<div class="w-8 h-11 bg-slate-700 rounded shrink-0"></div>`
@@ -243,19 +243,20 @@ function renderSelected() {
                 <p class="text-white text-sm font-medium truncate">${b.title}</p>
                 <p class="text-slate-500 text-xs">${b.author}</p>
             </div>
-            <button type="button" onclick="removeBook('${b.title.replace(/'/g, "\\'")}')"
+            <button type="button"
+                    onclick="removeBook('${b.external_id}')"
                     class="text-slate-600 hover:text-red-400 transition ml-2 shrink-0">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </button>
         </div>
     `).join('');
 
-    // Sync hidden inputs — kirim title saja (controller cari by title di DB)
-    // Kalau autocomplete sudah return id, ganti ke book_ids[]
+    // ✅ Kunci utama — pakai book_external_ids[] bukan book_titles[]
     bookInputsEl.innerHTML = selectedBooks.map(b =>
-        `<input type="hidden" name="book_titles[]" value="${b.title.replace(/"/g, '&quot;')}">`
+        `<input type="hidden" name="book_external_ids[]" value="${b.external_id}">`
     ).join('');
 }
 </script>
