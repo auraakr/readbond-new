@@ -24,11 +24,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
                 </svg>
                 <input type="text" placeholder="Cari collection..."
-                       class="w-full bg-slate-800 border border-slate-700 text-white text-sm rounded-lg
+                       class="w-full bg-slate-800 border border-slate-700 text-white text-sm rounded-sm
                               py-2.5 pl-10 pr-4 focus:ring-2 focus:ring-purple-500 outline-none
                               placeholder-slate-500 transition">
             </div>
-            <select class="bg-slate-800 text-slate-300 border border-slate-700 rounded-lg px-4 py-2.5
+            <select class="bg-slate-800 text-slate-300 border border-slate-700 rounded-sm px-4 py-2.5
                            text-sm outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer transition">
                 <option value="">Genre</option>
                 <option>Fiction</option>
@@ -52,20 +52,20 @@
 
         <div class="space-y-8">
             @forelse($featured as $col)
-            <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-5 lg:p-6
+            <div class="border-b border-slate-700 py-5 lg:py-6
                         hover:border-slate-600 transition group">
                 <div class="flex flex-col lg:flex-row lg:items-center gap-5">
 
                     {{-- Book stack preview --}}
                     <div class="flex gap-2 shrink-0 relative">
                         @foreach($col->books as $i => $b)
-                            <div class="w-20 lg:w-24 aspect-[3/4] rounded-lg overflow-hidden
+                            <div class="w-20 lg:w-24 aspect-[3/4] rounded-sm overflow-hidden
                                         bg-slate-700 border border-slate-600 shrink-0
                                         transition-transform duration-300
                                         {{ $i > 2 ? 'hidden sm:block' : '' }}"
                                  style="{{ $i > 0 ? 'margin-left: -16px; z-index:'.($i).';' : '' }} position: relative; z-index: {{ 4 - $i }}">
                                 @if($b->cover)
-                                    <img src="{{ asset('storage/' . $b->cover) }}" alt="{{ $b->title }}" class="w-full h-full object-cover">
+                                    <img src="{{ $b->cover }}" alt="{{ $b->title }}" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-slate-600">
                                         <svg class="w-8 h-8 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -137,7 +137,7 @@
             @forelse($popular as $col)
             <a href="{{ route('collections.show', $col->id) }}" class="group flex flex-col">
                 {{-- Cover collage --}}
-                <div class="aspect-square bg-slate-800 rounded-xl border border-slate-700 overflow-hidden
+                <div class="aspect-square bg-slate-800 rounded-sm border border-slate-700 overflow-hidden
                             mb-3 relative grid grid-cols-2 gap-0.5 p-0.5
                             group-hover:border-purple-500 transition-all duration-300
                             group-hover:shadow-lg group-hover:shadow-purple-900/30">

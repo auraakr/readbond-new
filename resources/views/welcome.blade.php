@@ -162,7 +162,7 @@
 
     <!-- Social Proof Section -->
     <section>
-        <div class="rb-section py-20 px-6 lg:px-32">
+        <div class="rb-section py-20 px-6 ">
             <p class="rb-section-label">Testimonials</p>
             <h2 class="rb-section-title" style="margin-bottom:40px;">What Readers Say</h2>
     

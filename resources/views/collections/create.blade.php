@@ -89,10 +89,9 @@
                 <h2 class="text-white font-bold text-base mb-1 flex items-center gap-2">
                     <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-300 text-xs
                                  flex items-center justify-center font-black">2</span>
-                    Tambah Buku
-                    <span class="text-slate-500 font-normal text-sm">(opsional)</span>
+                    Tambah Buku<span class="text-red-400">*</span>
                 </h2>
-                <p class="text-slate-500 text-xs mb-5 ml-8">Kamu bisa tambah buku nanti dari halaman koleksi.</p>
+                <p class="text-slate-500 text-xs mb-5 ml-8">Tambahkan buku yang ingin kamu tambahkan ke dalam koleksimu minimal 1 buku.</p>
 
                 {{-- Search buku --}}
                 <div class="relative mb-4" autocomplete="off">
@@ -229,6 +228,17 @@ function removeBook(externalId) {
     renderSelected();
 }
 
+function checkSubmit() {
+    const submitBtn = document.querySelector('button[type="submit"]');
+    if (selectedBooks.length === 0) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+}
+
 // GANTI renderSelected — hidden input pakai book_external_ids[]
 function renderSelected() {
     emptyBooksEl.classList.toggle('hidden', selectedBooks.length > 0);
@@ -258,6 +268,8 @@ function renderSelected() {
     bookInputsEl.innerHTML = selectedBooks.map(b =>
         `<input type="hidden" name="book_external_ids[]" value="${b.external_id}">`
     ).join('');
+
+    checkSubmit(); 
 }
 </script>
 @endsection

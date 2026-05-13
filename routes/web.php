@@ -6,6 +6,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\BooksController;
 use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\ReadingLogController;
+
+use App\Http\Controllers\Admin\BookController as AdminBookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +19,20 @@ Route::get('/', WelcomeController::class)->name('welcome');
 Route::get('/books', [BooksController::class, 'index'])->name('books');
 Route::get('/books/autocomplete', [BooksController::class, 'autocomplete'])->name('books.autocomplete');
 Route::get('/books/{external_id}', [BooksController::class, 'show'])->name('books.show');
+
+// Protected book routes (butuh login)
+Route::middleware('auth')->prefix('books')->name('books.')->group(function () {
+    Route::post('/{id}/like',              [BooksController::class, 'toggleLike'])->name('like');
+    Route::post('/{id}/rate',              [BooksController::class, 'rate'])->name('rate');
+    Route::post('/{id}/readlist',          [BooksController::class, 'toggleReadlist'])->name('readlist');
+    Route::post('/{id}/reading-log',       [BooksController::class, 'storeReadingLog'])->name('reading-log');
+    Route::post('/{id}/add-to-collection', [BooksController::class, 'addToCollection'])->name('add-to-collection');
+});
+
+Route::middleware('auth')->prefix('reading-log')->name('reading-log.')->group(function () {
+    Route::get('/',          [ReadingLogController::class, 'index'])->name('index');
+    Route::delete('/{id}',   [ReadingLogController::class, 'destroy'])->name('destroy');
+});
 
 Route::prefix('collections')->name('collections.')->group(function () {
     // PUBLIC routes
@@ -58,7 +75,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         return view('admin.dashboard');
     })->name('dashboard');
     
-    // Tambahkan route admin lainnya di sini...
+    // Menggunakan alias AdminBookController agar tidak bentrok dengan BooksController user
+    Route::resource('books', AdminBookController::class);
 });
 
 /*

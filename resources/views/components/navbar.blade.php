@@ -17,6 +17,12 @@
                 <x-nav-link href="/collections" :active="request()->is('collection*')">Collection</x-nav-link>
                 <x-nav-link href="/friends" :active="request()->is('friends*')">Friends</x-nav-link>
                 
+                @auth
+                    @if(auth()->user()->role === 'admin')
+                        <x-nav-link href="/admin/dashboard" :active="request()->is('admin*')">Dashboard</x-nav-link>
+                    @endif
+                @endauth
+                
                 <div class="h-6 w-[1px] bg-slate-700 mx-2"></div>
 
                 @auth
@@ -87,9 +93,12 @@
         <div class="flex flex-col gap-2">
             <x-responsive-nav-link href="/" :active="request()->is('/')">Home</x-responsive-nav-link>
             <x-responsive-nav-link href="/books" :active="request()->is('books*')">Books</x-responsive-nav-link>
-            <x-responsive-nav-link href="/collection" :active="request()->is('collection*')">Collection</x-responsive-nav-link>
+            <x-responsive-nav-link href="/collections" :active="request()->is('collection*')">Collection</x-responsive-nav-link>
             @auth
                 <x-responsive-nav-link href="{{ route('profile', ['user' => auth()->user()->username]) }}" :active="request()->is('profile*')">My Profile</x-responsive-nav-link>
+                @if(auth()->user()->role === 'admin')
+                    <x-responsive-nav-link href="/admin/dashboard" :active="request()->is('admin*')">Dashboard</x-responsive-nav-link>
+                @endif
             @endauth
         </div>
 

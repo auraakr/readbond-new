@@ -40,4 +40,26 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    // ── Relationships ──
+
+    public function bookRatings()
+    {
+        return $this->hasMany(UserBookRating::class);
+    }
+
+    public function bookLikes()
+    {
+        return $this->hasMany(BookLike::class);
+    }
+
+    public function readingLists()
+    {
+        return $this->hasMany(UserReadingList::class);
+    }
+
+    public function collections()
+    {
+        return $this->hasMany(Collection::class, 'user_id');
+    }
 }

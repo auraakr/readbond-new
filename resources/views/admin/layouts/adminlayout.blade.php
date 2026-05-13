@@ -22,7 +22,7 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Navbar -->
-            @include('admin.components.navbar')
+            
 
             <!-- Content Area -->
             <main class="flex-1 overflow-y-auto">

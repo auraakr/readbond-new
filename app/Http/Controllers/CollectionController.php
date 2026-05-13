@@ -71,7 +71,7 @@ class CollectionController extends Controller
         $validated = $request->validate([
             'title'               => 'required|string|max:255',
             'description'         => 'nullable|string|max:1000',
-            'book_external_ids'   => 'nullable|array',
+            'book_external_ids'   => 'required|array|min:1',
             'book_external_ids.*' => 'string',
         ]);
 
