@@ -185,20 +185,13 @@ class BooksController extends Controller
         // Similar books (based on genre/subject)
         $similarBooks = $this->getSimilarBooks($book, 6);
 
-        return inertia('Books/Show', [
-            'book' => $book,
-            'userLiked' => $userLiked,
-            'userRating' => $userRating,
-            'userInReadlist' => $userInReadlist,
-            'userReadingLog' => $userReadingLog,
-            'userCollections' => $userCollections,
-            'similarBooks' => $similarBooks,
-            'stats' => [
-                'likes_count' => $book->likes()->count(),
-                'ratings_count' => $book->ratings()->count(),
-                'readers_count' => $book->readingLogs()->whereIn('status', ['reading', 'finished'])->distinct('user_id')->count(),
-            ],
-        ]);
+        $stats = [
+            'likes_count' => $book->likes()->count(),
+            'ratings_count' => $book->ratings()->count(),
+            'readers_count' => $book->readingLogs()->whereIn('status', ['reading', 'finished'])->distinct('user_id')->count(),
+        ];
+
+        return view('book-detail', compact('book', 'similarBooks', 'userLiked', 'userRating', 'userInReadlist', 'userReadingLog', 'userCollections', 'stats'));
     }
 
     /**
