@@ -257,7 +257,9 @@ class ProfileController extends Controller
      */
     public function books($username)
     {
-        $user = User::where('username', $username)->firstOrFail();
+        $user = User::where('username', $username)
+            ->withCount(['readingLogs as books_count'])
+            ->firstOrFail();
 
         // CARA TERBAIK: Ambil buku yang selesai + rating-nya sekaligus menggunakan relasi
         $finishedBooks = $user->readingLogs()
