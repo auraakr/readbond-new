@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function () {
     // Taruh route fitur user lain di sini (misal: /settings, /reading-log)
     Route::get('/{user:username}/activity', [ProfileController::class, 'activity'])->name('profile.activity');
     Route::get('/{user:username}/books', [ProfileController::class, 'books'])->name('profile.books');
-
+    Route::get('/{user:username}/reviews', [ProfileController::class, 'reviews'])->name('profile.reviews');
     /**
      * CATCH-ALL ROUTE (WAJIB PALING BAWAH)
      * Route ini ditaruh paling bawah agar tidak bentrok dengan route statis.

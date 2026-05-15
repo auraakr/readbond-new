@@ -13,10 +13,7 @@
 
     {{-- ── BOOKS GRID ── --}}
     <div class="max-w-6xl mx-auto px-6 py-8">
-        <div class="mb-6">
-            <h2 class="text-xl font-semibold mb-2">Finished Books</h2>
-            <p class="text-slate-400 text-sm">{{ $finishedBooks->total() }} books finished</p>
-        </div>
+        <p class="text-[10px] py-3 font-semibold uppercase tracking-widest text-slate-500">Finished Books</p>
 
         @if($finishedBooks->count() > 0)
         <div class="grid grid-cols-3 lg:grid-cols-8 gap-4">

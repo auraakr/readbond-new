@@ -52,7 +52,7 @@ class ProfileController extends Controller
             ->whereYear('finished_at', now()->year)
             ->count();
 
-        return view('profile', [
+        return view('user.profile', [
             'user' => $user,
             'recentActivity' => $recentActivity,
             'recentReviews' => $recentReviews,
@@ -163,7 +163,7 @@ class ProfileController extends Controller
         // Ambil semua aktivitas (tanpa limit)
         $allActivity = $this->getAllRecentActivity($user);
 
-        return view('profile-activity', [
+        return view('user.profile-activity', [
             'user' => $user,
             'allActivity' => $allActivity,
         ]);
@@ -271,6 +271,34 @@ class ProfileController extends Controller
             ->latest('finished_at')
             ->paginate(12);
 
-        return view('profile-books', compact('user', 'finishedBooks'));
+        return view('user.profile-books', compact('user', 'finishedBooks'));
+    }
+
+    /**
+     * Tampilkan halaman reviews lengkap
+     */
+    public function reviews($username)
+    {
+        $user = User::where('username', $username)
+            ->withCount(['readingLogs as books_count'])
+            ->firstOrFail();
+
+        // Ambil semua ulasan
+        $allReviews = $this->getAllReviews($user);
+
+        return view('user.profile-reviews', [
+            'user' => $user,
+            'allReviews' => $allReviews,
+        ]);
+    }
+
+    public function getAllReviews($user)
+    {
+        return $user->readingLogs()
+            ->with('book')
+            ->whereNotNull('notes')
+            ->where('notes', '!=', '')
+            ->latest()
+            ->get();
     }
 }
