@@ -13,46 +13,29 @@ class ProfileController extends Controller
     {
         // 1. Ambil data user beserta count relasinya
         $user = User::where('username', $username)
-            // ->withCount(['following', 'followers', 'readingLogs as books_count'])
             ->withCount(['readingLogs as books_count'])
             ->firstOrFail();
 
-        // 2. Ambil Buku Favorit (Asumsi ada kolom/relasi is_favorite di tabel books atau pivot)
-        // $favoriteBooks = $user->books()
-        //     ->wherePivot('is_favorite', true)
-        //     ->limit(4)
-        //     ->get();
+        // 2. Ambil semua aktivitas dan gabungkan
+        $recentActivity = $this->getRecentActivity($user);
 
-        // 4. Review Terbaru
-        $recentReviews = $user->readingLogs() // atau $user->reviews() tergantung nama relasimu
+        // 3. Review Terbaru (untuk section terpisah)
+        $recentReviews = $user->readingLogs()
             ->with('book')
+            ->whereNotNull('notes')
+            ->where('notes', '!=', '')
             ->latest()
-            ->where('status', 'finished')
             ->limit(3)
-            ->get()
-            ->map(function ($item) {
-                $item->activity_type = 'review'; // TAMBAHKAN INI
-                return $item;
-            });
+            ->get();
 
-        // 5. Readlist (Buku yang ingin dibaca / status 'want_to_read')
+        // 4. Readlist (Buku yang ingin dibaca)
         $readlist = $user->readingLists()
             ->with('book')
             ->latest()
-            ->limit(4)
+            ->limit(8)
             ->get();
 
-        $logs = $user->readingLogs()
-            ->with('book')
-            ->latest()
-            ->limit(5)
-            ->get()
-            ->map(function ($item) {
-                $item->activity_type = 'log'; // Tandai tipe aktivitas
-                return $item;
-            });
-
-        // 6. Distribusi Rating (untuk grafik batang)
+        // 5. Distribusi Rating (untuk grafik batang)
         $ratingsDistribution = $user->bookRatings()
             ->select('rating', DB::raw('count(*) as total'))
             ->groupBy('rating')
@@ -60,15 +43,9 @@ class ProfileController extends Controller
             ->pluck('total', 'rating')
             ->all();
             
-        // Isi default 0 jika rating tertentu tidak ada (1-5)
         $ratingsDistribution = array_replace([1=>0, 2=>0, 3=>0, 4=>0, 5=>0], $ratingsDistribution);
 
-        // 3. Aktivitas Terbaru (Log membaca)
-        $recentActivity = $logs->concat($recentReviews)
-        ->sortByDesc('created_at')
-        ->take(5);
-
-        // 7. Hitung buku yang dibaca tahun ini
+        // 6. Hitung buku yang dibaca tahun ini
         $booksThisYear = $user->readingLogs()
             ->where('status', 'finished')
             ->whereYear('finished_at', now()->year)
@@ -76,13 +53,100 @@ class ProfileController extends Controller
 
         return view('profile', [
             'user' => $user,
-            // 'favoriteBooks' => $favoriteBooks,
             'recentActivity' => $recentActivity,
             'recentReviews' => $recentReviews,
             'readlist' => $readlist,
             'ratingsDistribution' => $ratingsDistribution,
             'booksThisYear' => $booksThisYear,
-            // 'following' => $user->following()->limit(10)->get(),
         ]);
+    }
+
+    /**
+     * Gabungkan semua jenis aktivitas user
+     */
+    private function getRecentActivity($user)
+    {
+        $activities = collect();
+
+        // 1. Reading Logs (status changes)
+        $readingLogs = $user->readingLogs()
+            ->with('book')
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'type' => 'reading_log',
+                    'status' => $log->status,
+                    'book' => $log->book,
+                    'rating' => null,
+                    'notes' => $log->notes,
+                    'created_at' => $log->updated_at,
+                    'data' => $log,
+                ];
+            });
+
+        // 2. Likes
+        $likes = $user->bookLikes()
+            ->with('book')
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($like) {
+                return [
+                    'type' => 'like',
+                    'book' => $like->book,
+                    'rating' => null,
+                    'notes' => null,
+                    'created_at' => $like->created_at,
+                    'data' => $like,
+                ];
+            });
+
+        // 3. Ratings
+        $ratings = $user->bookRatings()
+            ->with('book')
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($rating) {
+                return [
+                    'type' => 'rating',
+                    'book' => $rating->book,
+                    'rating' => $rating->rating,
+                    'notes' => null,
+                    'created_at' => $rating->created_at,
+                    'data' => $rating,
+                ];
+            });
+
+        // 4. Reviews (reading logs with notes)
+        $reviews = $user->readingLogs()
+            ->with('book')
+            ->whereNotNull('notes')
+            ->where('notes', '!=', '')
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'type' => 'review',
+                    'book' => $log->book,
+                    'rating' => null,
+                    'notes' => $log->notes,
+                    'created_at' => $log->updated_at,
+                    'data' => $log,
+                ];
+            });
+
+        // Gabungkan semua dan sort by created_at
+        return $activities
+            ->concat($readingLogs)
+            ->concat($likes)
+            ->concat($ratings)
+            ->concat($reviews)
+            ->sortByDesc('created_at')
+            ->take(5) // Ambil 12 aktivitas terbaru
+            ->values();
     }
 }

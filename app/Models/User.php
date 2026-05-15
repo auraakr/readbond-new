@@ -68,4 +68,12 @@ class User extends Authenticatable
         return $this->hasMany(Collection::class, 'user_id');
     }
 
+    public function getBooksThisYearAttribute()
+    {
+        return $this->readingLogs()
+            ->where('status', 'finished')
+            ->whereYear('finished_at', now()->year)
+            ->count();
+    }
+
 }

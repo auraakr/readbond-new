@@ -121,33 +121,6 @@
                     </div>
                 </section>
 
-                {{-- Recent Activity --}}
-                <section>
-                    <div class="flex items-center justify-between mb-4">
-                        <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Recent Activity</p>
-                        <a href="#" class="text-[10px] font-semibold uppercase tracking-widest text-slate-600 hover:text-purple-400 transition">All</a>
-                    </div>
-                    <div class="grid grid-cols-4 gap-3">
-                        @foreach($recentActivity ?? [] as $entry)
-                        <div class="group">
-                            <div class="aspect-[3/4] rounded-sm overflow-hidden bg-slate-800 border border-white/5 group-hover:border-purple-500/40 transition mb-2">
-                                @if($entry->book->cover_url ?? null)
-                                    <img src="{{ $entry->book->cover_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="">
-                                @endif
-                            </div>
-                            {{-- Rating stars --}}
-                            @if($entry->rating ?? null)
-                            <div class="flex items-center gap-1">
-                                @for($s = 1; $s <= 5; $s++)
-                                    <span class="text-[10px] {{ $s <= $entry->rating ? 'text-purple-400' : 'text-slate-700' }}">★</span>
-                                @endfor
-                            </div>
-                            @endif
-                        </div>
-                        @endforeach
-                    </div>
-                </section>
-
                 {{-- Recent Reviews --}}
                 <section>
                     <div class="flex items-center justify-between mb-4">
@@ -321,15 +294,63 @@
                         <a href="#" class="text-[10px] font-semibold uppercase tracking-widest text-slate-600 hover:text-purple-400 transition">All</a>
                     </div>
                     <div class="flex flex-col divide-y divide-white/5">
-                        @forelse($activityFeed ?? [] as $item)
-                        <div class="px-4 py-3 flex gap-2 items-start">
-                            <div class="w-1.5 h-1.5 rounded-full bg-purple-500/50 flex-shrink-0 mt-1.5"></div>
-                            <p class="text-xs text-slate-400 leading-snug">{{ $item->description ?? '' }}
-                                <span class="text-slate-600 ml-1">{{ $item->created_at?->diffForHumans(null, true) }}</span>
-                            </p>
+                        @forelse($recentActivity as $activity)
+                        <div class="flex items-start gap-3 p-3 bg-slate-900/50 border border-white/5 transition group">
+                            {{-- Activity Content --}}
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm text-white">
+                                    @if($activity['type'] === 'like')
+                                        liked
+                                    @elseif($activity['type'] === 'rating')
+                                        rated
+                                    @elseif($activity['type'] === 'review')
+                                        reviewed
+                                    @elseif($activity['type'] === 'reading_log')
+                                        @if($activity['status'] === 'want_to_read')
+                                            wants to read
+                                        @elseif($activity['status'] === 'reading')
+                                            is reading
+                                        @elseif($activity['status'] === 'finished')
+                                            finished
+                                        @endif
+                                    @endif
+                                    <a href="{{ route('books.show', $activity['book']->external_id) }}" 
+                                    class="font-semibold hover:text-purple-400 transition">
+                                        {{ $activity['book']->title }}
+                                    </a>
+                                </p>
+                                
+                                @if($activity['rating'])
+                                <div class="flex items-center gap-0.5 mt-1">
+                                    @for($s = 1; $s <= 5; $s++)
+                                        <span class="text-xs {{ $s <= $activity['rating'] ? 'text-yellow-400' : 'text-slate-700' }}">★</span>
+                                    @endfor
+                                </div>
+                                @endif
+
+                                @if($activity['notes'])
+                                <p class="text-xs text-slate-400 mt-1 line-clamp-2">{{ $activity['notes'] }}</p>
+                                @endif
+
+                                <p class="text-[10px] text-slate-600 mt-1">
+                                    {{ $activity['created_at']->diffForHumans() }}
+                                </p>
+                            </div>
+
+                            {{-- Book Cover Thumbnail --}}
+                            <a href="{{ route('books.show', $activity['book']->external_id) }}" 
+                            class="flex-shrink-0 w-12 h-16 rounded overflow-hidden bg-slate-800 border border-white/10 group-hover:border-purple-500/50 transition">
+                                @if($activity['book']->cover_url)
+                                    <img src="{{ $activity['book']->cover_url }}" 
+                                        class="w-full h-full object-cover" 
+                                        alt="{{ $activity['book']->title }}">
+                                @endif
+                            </a>
                         </div>
                         @empty
-                        <p class="px-4 py-4 text-xs text-slate-600">No activity yet.</p>
+                        <div class="text-center py-8 text-slate-500 text-sm">
+                            No activity yet
+                        </div>
                         @endforelse
                     </div>
                 </div>
