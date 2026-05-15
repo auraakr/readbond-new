@@ -1,6 +1,6 @@
 @extends('layouts.profile')
 
-@section('title', $user->username . "'s Activity")
+@section('title', $user->username . "'s Reviews")
 
 @section('content')
 

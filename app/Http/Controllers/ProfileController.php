@@ -319,4 +319,23 @@ class ProfileController extends Controller
             'readlistBooks' => $readlistBooks,
         ]);
     }
+
+    public function collections($username)
+    {
+        $user = User::where('username', $username)
+            ->withCount(['readingLogs as books_count'])
+            ->firstOrFail();
+
+        // Ambil semua koleksi user
+        $collections = $user->collections()
+            ->with(['curator', 'books' => fn($q) => $q->limit(4)])
+            ->withCount('books')
+            ->latest()
+            ->get();
+
+        return view('user.profile-collections', [
+            'user' => $user,
+            'collections' => $collections,
+        ]);
+    }
 }

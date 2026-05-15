@@ -1,6 +1,6 @@
 @extends('layouts.profile')
 
-@section('title', $user->username . "'s Books")
+@section('title', $user->username . "'s Readlist")
 
 @section('content')
 
@@ -23,7 +23,7 @@
                 $userRating = $book->ratings->first()?->rating;
             @endphp
             <div class="group">
-                <a href="{{ route('books.show', $book->external_id) }}" 
+                <a href="{{ route('book-detail', $book->external_id) }}" 
                    class="block rounded-sm overflow-hidden transition">
                     <div class="relative aspect-[2/3] rounded-sm overflow-hidden bg-slate-800 border border-white/5 group-hover:border-purple-100 transition shadow-sm">
                         {{-- Book Cover --}}
@@ -126,7 +126,7 @@
             </svg>
             <p class="text-slate-500 text-lg font-medium">No finished books yet</p>
             <p class="text-slate-600 text-sm mt-2">Start reading and mark books as finished to see them here.</p>
-            <a href="{{ route('books.index') }}" 
+            <a href="{{ route('books') }}" 
                class="mt-6 inline-block px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-sm transition">
                 Browse Books
             </a>
