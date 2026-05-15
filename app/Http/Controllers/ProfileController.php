@@ -149,4 +149,105 @@ class ProfileController extends Controller
             ->take(5) // Ambil 12 aktivitas terbaru
             ->values();
     }
+
+    /**
+     * Tampilkan halaman activity lengkap
+     */
+    public function activity($username)
+    {
+        $user = User::where('username', $username)
+            ->withCount(['readingLogs as books_count'])
+            ->firstOrFail();
+
+        // Ambil semua aktivitas (tanpa limit)
+        $allActivity = $this->getAllRecentActivity($user);
+
+        return view('profile-activity', [
+            'user' => $user,
+            'allActivity' => $allActivity,
+        ]);
+    }
+
+    /**
+     * Ambil semua aktivitas user (untuk halaman activity full)
+     */
+    private function getAllRecentActivity($user)
+    {
+        $activities = collect();
+
+        // 1. Reading Logs
+        $readingLogs = $user->readingLogs()
+            ->with('book')
+            ->latest()
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'type' => 'reading_log',
+                    'status' => $log->status,
+                    'book' => $log->book,
+                    'rating' => null,
+                    'notes' => $log->notes,
+                    'created_at' => $log->updated_at,
+                    'data' => $log,
+                ];
+            });
+
+        // 2. Likes
+        $likes = $user->bookLikes()
+            ->with('book')
+            ->latest()
+            ->get()
+            ->map(function ($like) {
+                return [
+                    'type' => 'like',
+                    'book' => $like->book,
+                    'rating' => null,
+                    'notes' => null,
+                    'created_at' => $like->created_at,
+                    'data' => $like,
+                ];
+            });
+
+        // 3. Ratings
+        $ratings = $user->bookRatings()
+            ->with('book')
+            ->latest()
+            ->get()
+            ->map(function ($rating) {
+                return [
+                    'type' => 'rating',
+                    'book' => $rating->book,
+                    'rating' => $rating->rating,
+                    'notes' => null,
+                    'created_at' => $rating->created_at,
+                    'data' => $rating,
+                ];
+            });
+
+        // 4. Reviews
+        $reviews = $user->readingLogs()
+            ->with('book')
+            ->whereNotNull('notes')
+            ->where('notes', '!=', '')
+            ->latest()
+            ->get()
+            ->map(function ($log) {
+                return [
+                    'type' => 'review',
+                    'book' => $log->book,
+                    'rating' => null,
+                    'notes' => $log->notes,
+                    'created_at' => $log->updated_at,
+                    'data' => $log,
+                ];
+            });
+
+        return $activities
+            ->concat($readingLogs)
+            ->concat($likes)
+            ->concat($ratings)
+            ->concat($reviews)
+            ->sortByDesc('created_at')
+            ->values();
+    }
 }

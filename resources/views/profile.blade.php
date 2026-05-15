@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.profile')
 
 @section('title', $user->username . "'s Profile")
 
@@ -10,89 +10,6 @@
     .scrollbar-hide::-webkit-scrollbar { display: none; }
     .scrollbar-hide { -ms-overflow-style: none; scrollbar-hide: none; }
 </style>
-
-<div class="min-h-screen bg-[#0a0a0f] text-white" style="font-family:'DM Sans',sans-serif;">
-
-    {{-- ── HEADER / HERO ── --}}
-    <div class="bg-slate-900 border-b border-white/5">
-        <div class="max-w-6xl mx-auto px-6 py-10">
-            <div class="flex items-start gap-6">
-
-                {{-- Avatar --}}
-                <div class="relative flex-shrink-0">
-                    <img src="{{ $user->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=8b5cf6&color=fff&size=96' }}"
-                        class="w-24 h-24 rounded-full object-cover ring-2 ring-white/10" alt="{{ $user->name }}">
-                </div>
-
-                {{-- Name + actions --}}
-                <div class="flex-1 min-w-0 pt-1">
-                    <div class="flex items-center gap-3 flex-wrap mb-1">
-                        <h1 class="text-2xl font-semibold tracking-tight">{{ $user->name }}</h1>
-                        @auth
-                            @if(auth()->id() === $user->id)
-                                <a href="#"
-                                    class="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider border border-white/15 text-slate-400 hover:border-white/30 hover:text-white rounded-sm transition">
-                                    Edit Profile
-                                </a>
-                            @else
-                                <button class="px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider bg-purple-600 hover:bg-purple-700 text-white rounded-sm transition">
-                                    Follow
-                                </button>
-                            @endif
-                        @endauth
-                    </div>
-                    @if($user->bio)
-                        <p class="text-sm text-slate-400 font-light max-w-lg mt-2">{{ $user->bio }}</p>
-                    @endif
-                </div>
-
-                {{-- Stats --}}
-                <div class="hidden sm:flex items-center gap-8 pt-1 flex-shrink-0">
-                    @foreach([
-                        ['label' => 'Books', 'value' => $user->books_count ?? 0],
-                        ['label' => 'This Year', 'value' => $user->books_this_year ?? 0],
-                        ['label' => 'Following', 'value' => $user->following_count ?? 0],
-                        ['label' => 'Followers', 'value' => $user->followers_count ?? 0],
-                    ] as $stat)
-                    <div class="text-center">
-                        <p class="text-xl font-semibold">{{ $stat['value'] }}</p>
-                        <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mt-0.5">{{ $stat['label'] }}</p>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- Mobile stats --}}
-            <div class="flex sm:hidden items-center gap-6 mt-6 pt-6 border-t border-white/5">
-                @foreach([
-                    ['label' => 'Books', 'value' => $user->books_count ?? 0],
-                    ['label' => 'This Year', 'value' => $user->books_this_year ?? 0],
-                    ['label' => 'Following', 'value' => $user->following_count ?? 0],
-                    ['label' => 'Followers', 'value' => $user->followers_count ?? 0],
-                ] as $stat)
-                <div class="text-center">
-                    <p class="text-lg font-semibold">{{ $stat['value'] }}</p>
-                    <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mt-0.5">{{ $stat['label'] }}</p>
-                </div>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Nav tabs --}}
-        <div class="max-w-6xl mx-auto px-6">
-            <nav class="flex gap-1 overflow-x-auto scrollbar-hide">
-                @foreach(['Profile','Activity','Books','Diary','Reviews','Readlist','Lists','Network'] as $tab)
-                    <a href="#"
-                        class="px-4 py-3 text-xs font-semibold uppercase tracking-widest whitespace-nowrap transition border-b-2
-                        {{ $loop->first
-                            ? 'text-white border-purple-500'
-                            : 'text-slate-500 border-transparent hover:text-slate-300 hover:border-white/20' }}">
-                        {{ $tab }}
-                    </a>
-                @endforeach
-            </nav>
-        </div>
-    </div>
 
     {{-- ── BODY ── --}}
     <div class="max-w-6xl mx-auto px-6 py-10">
@@ -291,7 +208,7 @@
                 <div class="border border-white/5 rounded-sm overflow-hidden bg-slate-900">
                     <div class="flex items-center justify-between px-4 py-3 border-b border-white/5">
                         <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Activity</p>
-                        <a href="#" class="text-[10px] font-semibold uppercase tracking-widest text-slate-600 hover:text-purple-400 transition">All</a>
+                        <a href="{{ route('profile.activity', $user->username) }}" class="text-[10px] font-semibold uppercase tracking-widest text-slate-600 hover:text-purple-400 transition">All</a>
                     </div>
                     <div class="flex flex-col divide-y divide-white/5">
                         @forelse($recentActivity as $activity)
@@ -360,7 +277,5 @@
 
         </div>
     </div>
-
-</div>
 
 @endsection

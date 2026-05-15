@@ -88,7 +88,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::middleware('auth')->group(function () {
     
     // Taruh route fitur user lain di sini (misal: /settings, /reading-log)
-    // ...
+    Route::get('/{user:username}/activity', [ProfileController::class, 'activity'])->name('profile.activity');
 
     /**
      * CATCH-ALL ROUTE (WAJIB PALING BAWAH)
