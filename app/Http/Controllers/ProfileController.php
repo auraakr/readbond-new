@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Book;
+use App\Models\BookRating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -249,5 +250,25 @@ class ProfileController extends Controller
             ->concat($reviews)
             ->sortByDesc('created_at')
             ->values();
+    }
+
+    /**
+     * Tampilkan halaman books yang sudah finished
+     */
+    public function books($username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        // CARA TERBAIK: Ambil buku yang selesai + rating-nya sekaligus menggunakan relasi
+        $finishedBooks = $user->readingLogs()
+            ->where('status', 'finished')
+            ->with(['book.ratings' => function($query) use ($user) {
+                // Hanya ambil rating milik user ini untuk buku tersebut
+                $query->where('user_id', $user->id);
+            }])
+            ->latest('finished_at')
+            ->paginate(12);
+
+        return view('profile-books', compact('user', 'finishedBooks'));
     }
 }

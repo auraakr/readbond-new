@@ -20,7 +20,7 @@ class Book extends Model
         'subject',
         'pageCount',
         'averageRating',
-        'view_count', // Tambahkan ini
+        'view_count',
     ];
 
     protected $casts = [
@@ -36,6 +36,12 @@ class Book extends Model
     }
 
     public function ratings()
+    {
+        return $this->hasMany(BookRating::class);
+    }
+
+    // Tambahkan alias untuk consistency
+    public function bookRatings()
     {
         return $this->hasMany(BookRating::class);
     }
