@@ -23,6 +23,7 @@ class CollectionController extends Controller
 
         $featured = Collection::where('is_featured', true)
             ->with(['curator', 'books' => fn($q) => $q->limit(4)])
+            ->where('visibility', 'public')
             ->withCount('books')
             ->latest()
             ->take(3)
@@ -31,6 +32,7 @@ class CollectionController extends Controller
         $popular = Collection::with(['curator', 'books' => fn($q) => $q->limit(4)])
             ->withCount(['books', 'comments'])
             ->when($search, fn($q) => $q->where('title', 'like', "%{$search}%"))
+            ->where('visibility', 'public')
             ->orderByDesc('likes_count')
             ->paginate(12);
 
@@ -71,6 +73,7 @@ class CollectionController extends Controller
         $validated = $request->validate([
             'title'               => 'required|string|max:255',
             'description'         => 'nullable|string|max:1000',
+            'visibility'          => 'nullable|in:public,private',
             'book_external_ids'   => 'required|array|min:1',
             'book_external_ids.*' => 'string',
         ]);
@@ -79,6 +82,7 @@ class CollectionController extends Controller
             'user_id'     => Auth::id(),
             'title'       => $validated['title'],
             'description' => $validated['description'] ?? null,
+            'visibility'  => $validated['visibility'] ?? 'public',
         ]);
 
         if (!empty($validated['book_external_ids'])) {
@@ -291,5 +295,30 @@ class CollectionController extends Controller
         $collection->books()->detach($request->book_id);
 
         return back()->with('success', 'Buku dihapus dari koleksi.');
+    }
+
+    // ────────────────────────────────────────────
+    // UPDATE VISIBILITY
+    // ────────────────────────────────────────────
+    public function updateVisibility(Request $request, string $id)
+    {
+        $collection = Collection::findOrFail($id);
+        if ($collection->user_id !== Auth::id()) abort(403);
+
+        $validated = $request->validate([
+            'visibility' => 'required|in:public,private',
+        ]);
+
+        $collection->update(['visibility' => $validated['visibility']]);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'visibility' => $collection->visibility,
+                'message' => 'Visibility berhasil diubah!',
+            ]);
+        }
+
+        return back()->with('success', 'Visibility koleksi berhasil diubah!');
     }
 }

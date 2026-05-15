@@ -14,6 +14,7 @@ class Collection extends Model
         'title',
         'description',
         'cover',
+        'visibility',
         'is_featured',
         'likes_count',
     ];

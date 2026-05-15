@@ -50,6 +50,7 @@ Route::prefix('collections')->name('collections.')->group(function () {
         Route::post('/comments/{commentId}/like', [CollectionController::class, 'toggleCommentLike'])->name('comments.like');
         Route::post('/{id}/books/add',            [CollectionController::class, 'addBook'])->name('books.add');
         Route::post('/{id}/books/remove',         [CollectionController::class, 'removeBook'])->name('books.remove');
+        Route::patch('/{id}/visibility',          [CollectionController::class, 'updateVisibility'])->name('visibility');
     });
 
     // PUBLIC routes (ditaruh paling bawah)
@@ -93,7 +94,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/{user:username}/reviews', [ProfileController::class, 'reviews'])->name('profile.reviews');
     Route::get('/{user:username}/readlist', [ProfileController::class, 'readlist'])->name('profile.readlist');
     Route::get('/{user:username}/collections', [ProfileController::class, 'collections'])->name('profile.collections');
-    
+
     /**
      * CATCH-ALL ROUTE (WAJIB PALING BAWAH)
      * Route ini ditaruh paling bawah agar tidak bentrok dengan route statis.

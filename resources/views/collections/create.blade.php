@@ -81,6 +81,22 @@
                         @enderror
                         <p class="text-slate-600 text-xs" id="desc-counter">0 / 1000</p>
                     </div>
+
+                    {{-- Visibility --}}
+                    <label for="visibility" class="block text-slate-300 text-sm font-medium mb-2">
+                        Visibilitas
+                    </label>
+                    <select name="visibility" id="visibility"
+                            class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl
+                                px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500
+                                focus:border-purple-500 placeholder-slate-600 transition">
+                        <option value="public" {{ old('visibility') === 'public' ? 'selected' : '' }}>
+                            Publik
+                        </option>
+                        <option value="private" {{ old('visibility') === 'private' ? 'selected' : '' }}>
+                            Pribadi
+                        </option>
+                    </select>
                 </div>
             </div>
 
@@ -92,7 +108,7 @@
                     Tambah Buku<span class="text-red-400">*</span>
                 </h2>
                 <p class="text-slate-500 text-xs mb-5 ml-8">Tambahkan buku yang ingin kamu tambahkan ke dalam koleksimu minimal 1 buku.</p>
-
+                
                 {{-- Search buku --}}
                 <div class="relative mb-4" autocomplete="off">
                     <svg class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5 pointer-events-none z-10"
