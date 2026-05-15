@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/{user:username}/activity', [ProfileController::class, 'activity'])->name('profile.activity');
     Route::get('/{user:username}/books', [ProfileController::class, 'books'])->name('profile.books');
     Route::get('/{user:username}/reviews', [ProfileController::class, 'reviews'])->name('profile.reviews');
+    Route::get('/{user:username}/readlist', [ProfileController::class, 'readlist'])->name('profile.readlist');
     /**
      * CATCH-ALL ROUTE (WAJIB PALING BAWAH)
      * Route ini ditaruh paling bawah agar tidak bentrok dengan route statis.

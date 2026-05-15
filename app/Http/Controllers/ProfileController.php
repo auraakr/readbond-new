@@ -301,4 +301,22 @@ class ProfileController extends Controller
             ->latest()
             ->get();
     }
+
+    public function readlist($username)
+    {
+        $user = User::where('username', $username)
+            ->withCount(['readingLogs as books_count'])
+            ->firstOrFail();
+
+        // Ambil semua buku di readlist
+        $readlistBooks = $user->readingLists()
+            ->with('book')
+            ->latest()
+            ->paginate(12);
+
+        return view('user.profile-readlist', [
+            'user' => $user,
+            'readlistBooks' => $readlistBooks,
+        ]);
+    }
 }
