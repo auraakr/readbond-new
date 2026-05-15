@@ -7,6 +7,7 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\BooksController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ReadingLogController;
+use App\Http\Controllers\ProfileController;
 
 use App\Http\Controllers\Admin\BookController as AdminBookController;
 
@@ -93,7 +94,5 @@ Route::middleware('auth')->group(function () {
      * CATCH-ALL ROUTE (WAJIB PALING BAWAH)
      * Route ini ditaruh paling bawah agar tidak bentrok dengan route statis.
      */
-    Route::get('/{user:username}', function (User $user) {
-        return view('profile', ['user' => $user]);
-    })->name('profile');
+    Route::get('/{user:username}', [ProfileController::class, 'show'])->name('profile');
 });

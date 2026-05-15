@@ -11,6 +11,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100">
    <x-navbar /> 
+   <x-reading-log-modal />
     <main class="pt-20">
         @yield('content')
     </main>

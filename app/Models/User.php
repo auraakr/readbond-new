@@ -45,7 +45,7 @@ class User extends Authenticatable
 
     public function bookRatings()
     {
-        return $this->hasMany(UserBookRating::class);
+        return $this->hasMany(BookRating::class);
     }
 
     public function bookLikes()
@@ -55,11 +55,17 @@ class User extends Authenticatable
 
     public function readingLists()
     {
-        return $this->hasMany(UserReadingList::class);
+        return $this->hasMany(BookReadList::class);
+    }
+
+    public function readingLogs()
+    {
+        return $this->hasMany(ReadingLog::class);
     }
 
     public function collections()
     {
         return $this->hasMany(Collection::class, 'user_id');
     }
+
 }

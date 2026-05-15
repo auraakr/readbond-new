@@ -81,7 +81,7 @@
         {{-- Nav tabs --}}
         <div class="max-w-6xl mx-auto px-6">
             <nav class="flex gap-1 overflow-x-auto scrollbar-hide">
-                @foreach(['Profile','Activity','Books','Diary','Reviews','Watchlist','Lists','Network'] as $tab)
+                @foreach(['Profile','Activity','Books','Diary','Reviews','Readlist','Lists','Network'] as $tab)
                     <a href="#"
                         class="px-4 py-3 text-xs font-semibold uppercase tracking-widest whitespace-nowrap transition border-b-2
                         {{ $loop->first
@@ -155,10 +155,10 @@
                         <a href="#" class="text-[10px] font-semibold uppercase tracking-widest text-slate-600 hover:text-purple-400 transition">More</a>
                     </div>
 
-                    <div class="flex flex-col gap-px border border-white/5 rounded-sm overflow-hidden">
+                    <div class="flex flex-col gap-px rounded-sm overflow-hidden">
                         @forelse($recentReviews ?? [] as $review)
-                        <div class="flex gap-4 p-4 bg-slate-900 hover:bg-slate-800/60 transition">
-                            <a href="#" class="flex-shrink-0 w-14 aspect-[3/4] rounded-sm overflow-hidden bg-slate-800">
+                        <div class="flex gap-4 p-4 border-b border-white/5 hover:bg-slate-800/60 transition">
+                            <a href="#" class="flex-shrink-0 w-14 aspect-[3/4] max-h-20 rounded-sm overflow-hidden bg-slate-800">
                                 @if($review->book->cover_url ?? null)
                                     <img src="{{ $review->book->cover_url }}" class="w-full h-full object-cover" alt="">
                                 @endif
@@ -179,7 +179,7 @@
                                         <span class="text-xs {{ $s <= ($review->rating ?? 0) ? 'text-purple-400' : 'text-slate-700' }}">★</span>
                                     @endfor
                                 </div>
-                                <p class="text-sm text-slate-400 font-light leading-relaxed line-clamp-2">{{ $review->body ?? '' }}</p>
+                                <p class="text-sm text-slate-400 font-light leading-relaxed line-clamp-2">{{ $review->notes ?? '' }}</p>
                                 <p class="text-[11px] text-slate-600 mt-2">{{ $review->likes_count ?? 0 }} likes</p>
                             </div>
                         </div>
@@ -232,23 +232,38 @@
             {{-- ── SIDEBAR ── --}}
             <div class="hidden lg:flex flex-col gap-6 w-64 flex-shrink-0">
 
-                {{-- Watchlist --}}
+                {{-- Readlist --}}
                 <div class="border border-white/5 rounded-sm overflow-hidden bg-slate-900">
                     <div class="flex items-center justify-between px-4 py-3 border-b border-white/5">
-                        <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Watchlist</p>
-                        <span class="text-[10px] text-slate-600">{{ count($user->watchlist ?? []) }}</span>
+                        <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Readlist</p>
+                        <span class="text-[10px] text-slate-600">{{ count($user->readlist ?? []) }}</span>
                     </div>
-                    <div class="grid grid-cols-4 gap-px bg-white/5">
-                        @foreach(array_slice($user->watchlist ?? [], 0, 4) as $book)
-                        <div class="aspect-[3/4] overflow-hidden bg-slate-800">
-                            @if($book->cover_url ?? null)
-                                <img src="{{ $book->cover_url }}" class="w-full h-full object-cover hover:scale-105 transition" alt="">
-                            @endif
-                        </div>
-                        @endforeach
-                        @for($i = count(array_slice($user->watchlist ?? [], 0, 4)); $i < 4; $i++)
-                        <div class="aspect-[3/4] bg-slate-800/50"></div>
-                        @endfor
+                    <div class="grid grid-cols-4">
+                        @forelse($readlist as $item)
+                            {{-- Mengakses data buku melalui relasi 'book' --}}
+                            <a href="{{ route('books.show', $item->book->id) }}" 
+                            class="group block aspect-[3/4] rounded-sm overflow-hidden bg-slate-800 border border-white/5 hover:border-purple-500/50 transition shadow-lg"
+                            title="{{ $item->book->title }}">
+                                
+                                <img src="{{ $item->book->cover_url }}" 
+                                    class="w-full h-full object-cover group-hover:scale-105 transition duration-300" 
+                                    alt="{{ $item->book->title }}">
+                            </a>
+                        @empty
+                            {{-- Tampilan jika list kosong --}}
+                            <div class="col-span-4 py-8 text-center border border-dashed border-white/10 rounded-sm">
+                                <p class="text-xs text-slate-500 uppercase tracking-widest">No books in readlist</p>
+                            </div>
+                        @endforelse
+
+                        {{-- Opsional: Menambah placeholder jika buku kurang dari 4 agar grid tetap rapi --}}
+                        @if($readlist->count() > 0 && $readlist->count() < 4)
+                            @for($i = $readlist->count(); $i < 4; $i++)
+                                <div class="aspect-[3/4] rounded-sm bg-slate-800/30 border border-dashed border-white/5 flex items-center justify-center">
+                                    <x-heroicon-o-plus class="w-5 h-5 text-slate-800" />
+                                </div>
+                            @endfor
+                        @endif
                     </div>
                 </div>
 

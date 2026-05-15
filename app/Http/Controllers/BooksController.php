@@ -293,6 +293,7 @@ class BooksController extends Controller
             ->limit(6)
             ->get()
             ->map(fn($book) => [
+                'id'          => $book->id,
                 'external_id' => $book->external_id,
                 'title'       => $book->title,
                 'author'      => $book->author_name,
@@ -418,10 +419,17 @@ class BooksController extends Controller
             'notes'       => 'nullable|string|max:1000',
         ]);
 
-        Book::findOrFail($id);
+        // Handle both numeric ID and external_id
+        $book = null;
+        if (is_numeric($id)) {
+            $book = Book::findOrFail($id);
+        } else {
+            // Try to find by external_id
+            $book = Book::where('external_id', $id)->firstOrFail();
+        }
 
         ReadingLog::updateOrCreate(
-            ['user_id' => Auth::id(), 'book_id' => $id],
+            ['user_id' => Auth::id(), 'book_id' => $book->id],
             [
                 'status'      => $request->status,
                 'started_at'  => $request->started_at,

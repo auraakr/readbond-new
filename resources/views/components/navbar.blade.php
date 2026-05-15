@@ -27,10 +27,10 @@
 
                 @auth
                     <div class="flex items-center gap-3">
-                        <a href="/reading-log/create" class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-4 rounded-sm transition-all shadow-lg shadow-purple-500/20">
+                        <button onclick="openReadingLogModal()" class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold py-2 px-4 rounded-sm transition-all shadow-lg shadow-purple-500/20">
                             <x-heroicon-o-plus class="h-4 w-4" />
                             <span>READING LOG</span>
-                        </a>
+                        </button>
 
                         <div class="relative">
                             <button @click="profileOpen = !profileOpen" @click.away="profileOpen = false" class="p-2 rounded-full text-slate-300 hover:text-white transition bg-slate-800 border border-white/5">
@@ -70,7 +70,7 @@
 
             <div class="flex items-center gap-2 sm:hidden">
                 @auth
-                    <a href="/reading-log/create" class="p-2 text-purple-400">
+                    <a href="#" onclick="openReadingLogModal(); return false;" class="p-2 text-purple-400">
                         <x-heroicon-o-plus-circle class="h-7 w-7" />
                     </a>
                 @else

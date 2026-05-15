@@ -80,7 +80,7 @@
 
                     {{-- Reading Log --}}
                     @auth
-                        <button onclick="openModal('modal-reading-log')"
+                        <button onclick="openReadingLogModalWithBook({{ $book->id }}, '{{ $book->external_id }}', '{{ addslashes($book->title) }}', '{{ addslashes($book->author_name) }}', '{{ $book->cover }}')"
                                 class="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-500
                                        text-white text-sm font-semibold rounded-lg transition shadow-lg shadow-purple-900/40">
                             <x-heroicon-o-book-open class="w-4 h-4" />
@@ -190,10 +190,15 @@
                     <hr class="border-slate-700 my-4">
 
                     @auth
-                        <button onclick="openModal('modal-reading-log')"
+                        <button onclick="openReadingLogModalWithBook({{ $book->id }}, '{{ $book->external_id }}', '{{ addslashes($book->title) }}', '{{ addslashes($book->author_name) }}', '{{ $book->cover }}')"
                                 class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
                                        font-medium rounded-lg transition border border-slate-600 mb-2">
                             + Reading Log
+                        </button>
+                        <button onclick="openModal('modal-collection')"
+                                class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
+                                       font-medium rounded-lg transition border border-slate-600 mb-2">
+                            + Koleksi
                         </button>
                         <button onclick="toggleReadlist()"
                                 class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
@@ -205,6 +210,11 @@
                            class="block w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
                                   font-medium rounded-lg transition border border-slate-600 mb-2 text-center">
                             + Reading Log
+                        </a>
+                        <a href="{{ route('login') }}"
+                           class="block w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
+                                  font-medium rounded-lg transition border border-slate-600 mb-2 text-center">
+                            + Koleksi
                         </a>
                         <a href="{{ route('login') }}"
                            class="block w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
@@ -321,88 +331,26 @@
                     </div>
                 @endauth
                 <div class="mt-4 space-y-2">
-                    <button onclick="openModal('modal-reading-log')"
+                    <button onclick="openReadingLogModalWithBook({{ $book->id }}, '{{ $book->external_id }}', '{{ addslashes($book->title) }}', '{{ addslashes($book->author_name) }}', '{{ $book->cover }}')"
                             class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
                                    font-medium rounded-lg transition border border-slate-600">
                         + Reading Log
                     </button>
+                    <button onclick="openModal('modal-collection')"
+                            class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
+                                   font-medium rounded-lg transition border border-slate-600">
+                        + Koleksi
+                    </button>
                     <button onclick="toggleReadlist()"
                             class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
                                    font-medium rounded-lg transition border border-slate-600">
-                        + Ke Readlist
+                        {{ $userInReadlist ? '✓ Di Readlist' : '+ Ke Readlist' }}
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-{{-- ═══ MODAL: Reading Log ═══ --}}
-<div id="modal-reading-log"
-     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
-        <div class="flex justify-between items-center mb-5">
-            <h3 class="text-white font-bold text-lg">Reading Log</h3>
-            <button onclick="closeModal('modal-reading-log')" class="text-slate-500 hover:text-white transition">
-                <x-heroicon-o-x-mark class="w-5 h-5" />
-            </button>
-        </div>
-
-        <form action="{{ route('books.reading-log', $book->id) }}" method="POST" class="space-y-4">
-            @csrf
-            <div>
-                <label class="text-slate-300 text-sm font-medium mb-2 block">Status</label>
-                <div class="grid grid-cols-3 gap-2">
-                    @foreach(['want_to_read' => 'Ingin Baca', 'reading' => 'Sedang Baca', 'finished' => 'Selesai'] as $val => $label)
-                        <label class="cursor-pointer">
-                            <input type="radio" name="status" value="{{ $val }}" class="sr-only peer"
-                                   {{ ($userReadingLog?->status ?? 'want_to_read') === $val ? 'checked' : '' }}>
-                            <div class="text-center py-2 px-1 rounded-lg border border-slate-600
-                                        text-slate-400 text-xs cursor-pointer
-                                        peer-checked:border-purple-500 peer-checked:text-purple-300
-                                        peer-checked:bg-purple-500/10 hover:border-slate-500 transition">
-                                {{ $label }}
-                            </div>
-                        </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="text-slate-400 text-xs mb-1 block">Mulai Baca</label>
-                    <input type="date" name="started_at"
-                           value="{{ $userReadingLog?->started_at?->format('Y-m-d') }}"
-                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm
-                                  rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-purple-500">
-                </div>
-                <div>
-                    <label class="text-slate-400 text-xs mb-1 block">Selesai Baca</label>
-                    <input type="date" name="finished_at"
-                           value="{{ $userReadingLog?->finished_at?->format('Y-m-d') }}"
-                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm
-                                  rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-purple-500">
-                </div>
-            </div>
-
-            <div>
-                <label class="text-slate-400 text-xs mb-1 block">Catatan (opsional)</label>
-                <textarea name="notes" rows="2" placeholder="Catatan tentang buku ini..."
-                          class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg
-                                 px-3 py-2 resize-none outline-none focus:ring-2 focus:ring-purple-500
-                                 placeholder-slate-600">{{ $userReadingLog?->notes }}</textarea>
-            </div>
-
-            <button type="submit"
-                    class="w-full py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm
-                           font-semibold rounded-lg transition">
-                Simpan
-            </button>
-        </form>
-    </div>
-</div>
-
-{{-- ═══ MODAL: Tambah ke Koleksi ═══ --}}
 <div id="modal-collection"
      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
