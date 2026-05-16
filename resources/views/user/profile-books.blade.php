@@ -23,7 +23,7 @@
                 $userRating = $book->ratings->first()?->rating;
             @endphp
             <div class="group">
-                <a href="{{ route('books-detail', $book->external_id) }}" 
+                <a href="{{ route('books.show', $book->external_id) }}" 
                    class="block rounded-sm overflow-hidden transition">
                     <div class="relative aspect-[2/3] rounded-sm overflow-hidden bg-slate-800 border border-white/5 group-hover:border-purple-100 transition shadow-sm">
                         {{-- Book Cover --}}
