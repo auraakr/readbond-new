@@ -23,7 +23,8 @@ class User extends Authenticatable
         'email',
         'password',
         'age',
-        'streak_count',  
+        'reading_streak',
+        'last_diary_date',  
         'role',
         'avatar',
         'bio',
@@ -74,6 +75,21 @@ class User extends Authenticatable
             ->where('status', 'finished')
             ->whereYear('finished_at', now()->year)
             ->count();
+    }
+
+    public function diaryLogs()
+    {
+        return $this->hasMany(DiaryLog::class);
+    }
+
+    public function updateReadingStreak()
+    {
+        return DiaryLog::calculateStreak($this->id);
+    }
+
+    public function getReadingStreakAttribute()
+    {
+        return $this->attributes['reading_streak'] ?? 0;
     }
 
 }

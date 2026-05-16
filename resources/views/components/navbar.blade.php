@@ -15,6 +15,7 @@
                 <x-nav-link href="/" :active="request()->is('/')">Home</x-nav-link>
                 <x-nav-link href="/books" :active="request()->is('books*')">Books</x-nav-link>
                 <x-nav-link href="/collections" :active="request()->is('collection*')">Collection</x-nav-link>
+                <x-nav-link href="/diary" :active="request()->is('diary*')">Diary</x-nav-link>
                 <x-nav-link href="/friends" :active="request()->is('friends*')">Friends</x-nav-link>
                 
                 @auth
@@ -94,6 +95,7 @@
             <x-responsive-nav-link href="/" :active="request()->is('/')">Home</x-responsive-nav-link>
             <x-responsive-nav-link href="/books" :active="request()->is('books*')">Books</x-responsive-nav-link>
             <x-responsive-nav-link href="/collections" :active="request()->is('collection*')">Collection</x-responsive-nav-link>
+            <x-responsive-nav-link href="/diary" :active="request()->is('diary*')">Diary</x-responsive-nav-link>
             @auth
                 <x-responsive-nav-link href="{{ route('profile', ['user' => auth()->user()->username]) }}" :active="request()->is('profile*')">My Profile</x-responsive-nav-link>
                 @if(auth()->user()->role === 'admin')

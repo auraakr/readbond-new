@@ -8,6 +8,7 @@ use App\Http\Controllers\BooksController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ReadingLogController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DiaryLogController;
 
 use App\Http\Controllers\Admin\BookController as AdminBookController;
 
@@ -95,6 +96,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/{user:username}/readlist', [ProfileController::class, 'readlist'])->name('profile.readlist');
     Route::get('/{user:username}/collections', [ProfileController::class, 'collections'])->name('profile.collections');
 
+    // Diary routes
+    Route::get('/diary', [DiaryLogController::class, 'index'])->name('diary.index');
+    Route::get('/diary/create', [DiaryLogController::class, 'create'])->name('diary.create');
+    Route::post('/diary', [DiaryLogController::class, 'store'])->name('diary.store');
+    Route::get('/diary/{diaryLog}/edit', [DiaryLogController::class, 'edit'])->name('diary.edit');
+    Route::patch('/diary/{diaryLog}', [DiaryLogController::class, 'update'])->name('diary.update');
+    Route::delete('/diary/{diaryLog}', [DiaryLogController::class, 'destroy'])->name('diary.destroy');
+    Route::post('/diary/{diaryLog}/favorite', [DiaryLogController::class, 'toggleFavorite'])->name('diary.favorite');
     /**
      * CATCH-ALL ROUTE (WAJIB PALING BAWAH)
      * Route ini ditaruh paling bawah agar tidak bentrok dengan route statis.
