@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\DiaryLog;
 use App\Models\Book;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -15,7 +16,9 @@ class DiaryLogController extends Controller
      */
     public function index(Request $request)
     {
-        $user = Auth::user();
+        $user = User::where('id', Auth::id())
+            ->withCount(['readingLogs as books_count']) // atau ->withCount(['diaryLogs as books_count']) tergantung tabel mana yang dihitung
+            ->firstOrFail();
         $year = $request->input('year', now()->year);
         $month = $request->input('month');
 
@@ -49,6 +52,7 @@ class DiaryLogController extends Controller
             ->reverse();
 
         return view('diary.index', [
+            'user' => $user,
             'diaryLogs' => $diaryLogs,
             'streak' => $streak,
             'stats' => $stats,

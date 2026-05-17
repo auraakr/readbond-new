@@ -1,182 +1,136 @@
-@extends('layouts.main')
+@extends('layouts.profile')
 
-@section('title', 'My Diary')
+@section('title', 'My Reading Journals')
 
 @section('content')
-
-<div class="min-h-screen bg-[#0a0a0f] text-white pb-20" style="font-family:'DM Sans',sans-serif;">
+<div class="max-w-6xl mx-auto px-6 py-10 text-white min-h-screen">
     
-    {{-- Header --}}
-    <div class="bg-slate-900 border-b border-white/5 sticky top-0 z-10">
-        <div class="max-w-4xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <h1 class="text-xl font-bold">My Diary</h1>
-                <button onclick="openDiaryModal()" 
-                        class="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition text-sm font-semibold">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Add diary log
-                </button>
-            </div>
+    {{-- ── HEADER SECTION ── --}}
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-xl font-bold tracking-tight text-white">My Journals</h1>
+            <p class="text-xs text-slate-400 font-medium mt-0.5">🔥 {{ $streak }} Days Reading Streak</p>
         </div>
+        <button onclick="openCreateModal()" class="w-10 h-10 flex items-center justify-center bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-full transition-all shadow-lg shadow-purple-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+        </button>
     </div>
 
-    <div class="max-w-4xl mx-auto px-6 py-6">
+    {{-- ── HORIZONTAL CALENDAR ROW ── --}}
+    <div class="flex items-center gap-3 overflow-x-auto pb-4 mb-8 scrollbar-hide">
+        @php
+            $startOfWeek = now()->startOfWeek();
+        @endphp
         
-        {{-- Streak Card --}}
-        <div class="bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl p-6 mb-6 text-center">
-            <p class="text-sm font-semibold uppercase tracking-wider mb-2 opacity-90">Streak</p>
-            <div class="flex items-center justify-center gap-2 mb-1">
-                <span class="text-5xl">🔥</span>
-                <span class="text-5xl font-bold">{{ $streak }}</span>
-            </div>
-            <p class="text-sm opacity-90">{{ $streak === 1 ? 'day' : 'days' }} reading streak!</p>
-        </div>
+        @for($i = 0; $i < 7; $i++)
+            @php 
+                $date = $startOfWeek->copy()->addDays($i);
+                $isCurrentDay = $date->isToday();
+            @endphp
+            
+            <a href="?date={{ $date->format('Y-m-d') }}" 
+               class="flex-1 min-w-[50px] flex flex-col items-center py-3 px-2 rounded-2xl transition border {{ $isCurrentDay ? 'bg-slate-800 border-purple-600/50 shadow-md shadow-purple-600/5' : 'bg-slate-900/40 border-white/5 opacity-60 hover:opacity-100' }}">
+                
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    {{ $date->format('D') }}
+                </span>
+                
+                <span class="text-base font-bold mt-1 {{ $isCurrentDay ? 'text-purple-400' : 'text-slate-300' }}">
+                    {{ $date->format('d') }}
+                </span>
+                
+                @if($isCurrentDay)
+                    <span class="w-1 h-1 rounded-full bg-purple-500 mt-1"></span>
+                @endif
+            </a>
+        @endfor
+    </div>
 
-        {{-- Stats --}}
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-            <div class="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-purple-400">{{ $stats['total_entries'] }}</p>
-                <p class="text-xs text-slate-500 uppercase tracking-wider mt-1">Entries</p>
-            </div>
-            <div class="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-blue-400">{{ $stats['total_books'] }}</p>
-                <p class="text-xs text-slate-500 uppercase tracking-wider mt-1">Books</p>
-            </div>
-            <div class="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-green-400">{{ $stats['total_pages'] }}</p>
-                <p class="text-xs text-slate-500 uppercase tracking-wider mt-1">Pages</p>
-            </div>
-            <div class="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <p class="text-2xl font-bold text-yellow-400">{{ $stats['this_month'] }}</p>
-                <p class="text-xs text-slate-500 uppercase tracking-wider mt-1">This Month</p>
-            </div>
-        </div>
+    {{-- ── VERTICAL TIMELINE LOGS ── --}}
+    <div class="relative border-l-2 border-dashed border-slate-800 ml-4 pl-8 space-y-6">
+        @forelse($diaryLogs as $log)
+            <div class="relative group">
+                
+                {{-- Penunjuk Waktu / Samping (Timeline Bullet) --}}
+                <div class="absolute -left-[55px] top-8 bg-slate-900 px-1 text-[11px] font-bold text-slate-500 uppercase tracking-tighter">
+                    {{ $log->read_date->format('H:i') == '00:00' ? $log->read_date->format('M d') : $log->read_date->format('g A') }}
+                </div>
+                <div class="absolute -left-[37px] top-[18px] w-2 h-2 rounded-full bg-slate-700 group-hover:bg-purple-500 transition-colors duration-300"></div>
 
-        {{-- Filter Tabs --}}
-        <div class="bg-slate-900 border border-white/5 rounded-xl mb-6 overflow-hidden">
-            <div class="flex overflow-x-auto scrollbar-hide">
-                <button class="flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-widest border-b-2 border-purple-500 text-white whitespace-nowrap">
-                    Buku
-                </button>
-                <button class="flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition whitespace-nowrap">
-                    Judul
-                </button>
-                <button class="flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition whitespace-nowrap">
-                    Bulan
-                </button>
-                <button class="flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition whitespace-nowrap">
-                    Hari
-                </button>
-                <button class="flex-1 px-4 py-3 text-xs font-semibold uppercase tracking-widest border-b-2 border-transparent text-slate-500 hover:text-white transition whitespace-nowrap">
-                    Note
-                </button>
-            </div>
-        </div>
+                {{-- Card Log Jurnal --}}
+                <div class="bg-slate-800/40 p-5 rounded-3xl border border-white/5 shadow-sm hover:border-white/10 hover:bg-slate-800/60 transition-all duration-300 flex items-start gap-4">
+                    
+                    {{-- Visual Mood Indicator Icon --}}
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-xl bg-slate-800 border border-slate-700 shadow-inner">
+                        @switch(strtolower($log->mood))
+                            @case('happy') 😊 @break
+                            @case('sad') 😢 @break
+                            @case('excited') 🤩 @break
+                            @case('tired') 🥱 @break
+                            @default 📖
+                        @endswitch
+                    </div>
 
-        {{-- Diary Entries --}}
-        <div class="space-y-3">
-            @forelse($diaryLogs as $log)
-            <div class="bg-slate-900 border border-white/5 rounded-xl overflow-hidden hover:border-purple-500/30 transition group">
-                <div class="flex items-center gap-4 p-4">
-                    {{-- Book Cover --}}
-                    <a href="{{ route('books.show', $log->book->external_id) }}" 
-                       class="flex-shrink-0 w-16 h-24 rounded overflow-hidden bg-slate-800 border border-white/10 group-hover:border-purple-500/50 transition">
-                        @if($log->book->cover_url)
-                            <img src="{{ $log->book->cover_url }}" 
-                                 class="w-full h-full object-cover" 
-                                 alt="{{ $log->book->title }}">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center text-slate-600">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                                </svg>
-                            </div>
-                        @endif
-                    </a>
-
-                    {{-- Book Title --}}
+                    {{-- Konten Jurnal --}}
                     <div class="flex-1 min-w-0">
-                        <a href="{{ route('books.show', $log->book->external_id) }}" 
-                           class="font-semibold text-white hover:text-purple-400 transition line-clamp-1">
-                            {{ $log->book->title }}
-                        </a>
-                        <p class="text-xs text-slate-500 mt-0.5">{{ $log->book->author_name }}</p>
-                        
-                        @if($log->notes)
-                        <p class="text-sm text-slate-400 mt-2 line-clamp-2">{{ $log->notes }}</p>
-                        @endif
-
-                        @if($log->pages_read)
-                        <p class="text-xs text-slate-600 mt-1">{{ $log->pages_read }} pages read</p>
-                        @endif
-                    </div>
-
-                    {{-- Date --}}
-                    <div class="flex-shrink-0 text-center px-4">
-                        <p class="text-xs font-semibold uppercase tracking-wider text-purple-400">
-                            {{ $log->month_short }}
-                        </p>
-                        <p class="text-2xl font-bold text-white">{{ $log->day }}</p>
-                        <p class="text-xs text-slate-600">{{ $log->read_date->year }}</p>
-                    </div>
-
-                    {{-- Note Icon --}}
-                    <div class="flex-shrink-0">
-                        @if($log->notes)
-                        <div class="w-10 h-10 rounded-full bg-blue-600/20 flex items-center justify-center">
-                            <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                            </svg>
+                        <div class="flex items-start justify-between gap-2 mb-1">
+                            <h3 class="font-bold text-sm text-slate-200 tracking-tight leading-tight group-hover:text-purple-400 transition-colors duration-300">
+                                {{ $log->book->title ?? 'Untitled Log' }}
+                            </h3>
+                            
+                            {{-- Dropdown / Action Buttons --}}
+                            <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center gap-1">
+                                <button onclick="openEditModal({{ $log->id }})" class="p-1 text-slate-500 hover:text-purple-400 rounded-md hover:bg-slate-800">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                                    </svg>
+                                </button>
+                                <form action="{{ route('diary.destroy', $log->id) }}" method="POST" onsubmit="return confirm('Delete this log?')" class="inline">
+                                    @csrf @method('DELETE')
+                                    <button class="p-1 text-slate-500 hover:text-red-400 rounded-md hover:bg-slate-800">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
-                        @else
-                        <div class="w-10 h-10"></div>
-                        @endif
+
+                        <p class="text-xs text-slate-400 font-light mb-2">
+                            Progress: <span class="font-semibold text-purple-400">{{ $log->current_page ?? 0 }}</span> pg 
+                            @if($log->pages_read) <span class="text-emerald-400">(+{{ $log->pages_read }} read)</span> @endif
+                        </p>
+
+                        <p class="text-xs text-slate-300 font-light leading-relaxed line-clamp-3">
+                            {{ $log->notes ?? 'No thoughts recorded today.' }}
+                        </p>
+                        
+                        <div class="flex items-center gap-2 mt-3 text-[10px] text-slate-500 font-medium">
+                            <span>📄 {{ str_word_count($log->notes) }} total words</span>
+                            @if($log->is_favorite)
+                                <span class="text-rose-400">❤️ Favorite Entry</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
-            </div>
-            @empty
-            <div class="text-center py-16">
-                <svg class="w-16 h-16 mx-auto text-slate-700 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                </svg>
-                <p class="text-slate-500 text-lg font-medium">No diary entries yet</p>
-                <p class="text-slate-600 text-sm mt-2">Start logging your reading journey today!</p>
-                <button onclick="openDiaryModal()" 
-                        class="mt-6 px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg transition font-semibold">
-                    Add Your First Entry
-                </button>
-            </div>
-            @endforelse
-        </div>
 
-        {{-- Pagination --}}
-        @if($diaryLogs->hasPages())
-        <div class="mt-8">
-            {{ $diaryLogs->links() }}
-        </div>
-        @endif
+            </div>
+        @empty
+            <div class="text-center py-12 bg-slate-800/20 border border-dashed border-slate-700 rounded-3xl">
+                <p class="text-sm text-slate-500 font-light">Today was a blank page. No logs found.</p>
+            </div>
+        @endforelse
+    </div>
+    
+    {{-- Pagination --}}
+    <div class="mt-8 text-purple-500">
+        {{ $diaryLogs->links() }}
     </div>
 </div>
 
-{{-- Diary Modal Component --}}
-<x-diary-log-modal />
-
-<script>
-function openDiaryModal() {
-    document.getElementById('diary-modal').classList.remove('hidden');
-}
-</script>
-
-<style>
-.scrollbar-hide::-webkit-scrollbar {
-    display: none;
-}
-.scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-</style>
+{{-- Include file modal --}}
+@include('components.diary-log-modal')
 
 @endsection

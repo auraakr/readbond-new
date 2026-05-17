@@ -81,8 +81,8 @@
 
                 {{-- Nav tabs --}}
                 <div class="max-w-6xl mx-auto px-6">
-                    <nav class="flex gap-1 overflow-x-auto scrollbar-hide">
-                        @foreach(['Profile' => 'profile', 'Activity' => 'profile.activity', 'Books' => 'profile.books', 'Diary' => '#', 'Reviews' => 'profile.reviews', 'Readlist' => 'profile.readlist', 'Collections' => 'profile.collections', 'Network' => '#'] as $tab => $routeName)
+                    <nav class="flex gap-1 overflow-x-auto scrollbar-none">
+                        @foreach(['Profile' => 'profile', 'Activity' => 'profile.activity', 'Books' => 'profile.books', 'Diary' => 'diary.index', 'Clubs' => '#', 'Reviews' => 'profile.reviews', 'Readlist' => 'profile.readlist', 'Collections' => 'profile.collections', 'Network' => '#'] as $tab => $routeName)
                             @php
                                 $isActive = ($routeName !== '#') && request()->routeIs($routeName);
                             @endphp
