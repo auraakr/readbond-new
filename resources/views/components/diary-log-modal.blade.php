@@ -58,10 +58,23 @@
                 <textarea name="notes" id="modal_notes" rows="4" class="w-full bg-slate-800 border border-white/5 text-white rounded-2xl p-3 text-xs focus:ring-1 focus:ring-purple-500 focus:outline-none resize-none transition-all" placeholder="Write your painful or happy moments..."></textarea>
             </div>
 
-            {{-- Date Picker --}}
+            {{-- Reading Date --}}
             <div>
-                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Entry Date</label>
-                <input type="date" name="read_date" id="modal_read_date" value="{{ today()->format('Y-m-d') }}" class="w-full bg-slate-800 border border-white/5 text-white rounded-2xl p-3 text-xs focus:ring-1 focus:ring-purple-500 focus:outline-none transition-all">
+                <label class="text-slate-400 text-xs uppercase tracking-wide mb-2 block font-semibold">
+                    Reading Date
+                    <span class="text-slate-600 text-[10px] normal-case font-normal ml-1">
+                        (Today or Yesterday only)
+                    </span>
+                </label>
+                <input type="date" 
+                    name="read_date" 
+                    value="{{ date('Y-m-d') }}"
+                    max="{{ date('Y-m-d') }}"
+                    min="{{ date('Y-m-d', strtotime('-1 day')) }}"
+                    required
+                    class="w-full bg-[#14181c] border border-slate-700 text-white text-sm rounded-lg
+                            px-4 py-2.5 outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500
+                            transition">
             </div>
 
             {{-- Submit Button --}}

@@ -17,7 +17,7 @@
             <!-- header -->
             <div class="bg-slate-900 border-b border-white/5">
                 <div class="max-w-6xl mx-auto px-6 py-10">
-                    <div class="flex items-start gap-6">
+                    <div class="flex items-center gap-6">
 
                         {{-- Avatar --}}
                         <div class="relative flex-shrink-0">
