@@ -94,12 +94,39 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="text-slate-400 text-xs mb-1 block">Catatan (opsional)</label>
-                            <textarea name="notes" rows="3" placeholder="Catatan tentang buku ini..."
-                                    class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg
-                                            px-3 py-2 resize-none outline-none focus:ring-2 focus:ring-purple-500
-                                            placeholder-slate-600 transition"></textarea>
+                        {{-- Review Section (Only for Finished) --}}
+                        <div id="review-section" class="hidden space-y-3">
+                            <label class="text-slate-300 text-sm font-medium block">Review Buku</label>
+                            
+                            <div>
+                                <label class="text-slate-400 text-xs mb-2 block">Rating</label>
+                                <div class="flex gap-2">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <label class="cursor-pointer group">
+                                            <input type="radio" name="rating" value="{{ $i }}" class="hidden peer">
+                                            <span class="inline-block peer-checked:text-yellow-400 text-slate-600 group-hover:text-yellow-300 transition">
+                                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                                </svg>
+                                            </span>
+                                        </label>
+                                    @endfor
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-slate-400 text-xs mb-2 block">Review</label>
+                                <textarea name="review" rows="3" placeholder="Bagaimana pendapatmu tentang buku ini?"
+                                        class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg
+                                                px-3 py-2 resize-none outline-none focus:ring-2 focus:ring-purple-500
+                                                placeholder-slate-600 transition"></textarea>
+                            </div>
+
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="is_liked" class="w-4 h-4 rounded bg-slate-900 border-slate-700 
+                                                                               text-purple-600 focus:ring-purple-500 transition">
+                                <span class="text-slate-300 text-sm">Saya suka buku ini</span>
+                            </label>
                         </div>
 
                         <button type="submit"
@@ -242,6 +269,22 @@ function readingLogBackToSearch() {
     selectedBookId = null;
     document.getElementById('reading-log-search').focus();
 }
+
+// Toggle review section based on status
+document.querySelectorAll('input[name="status"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const reviewSection = document.getElementById('review-section');
+        if (this.value === 'finished') {
+            reviewSection.classList.remove('hidden');
+        } else {
+            reviewSection.classList.add('hidden');
+            // Clear review fields when not finished
+            document.querySelector('input[name="rating"]').checked = false;
+            document.querySelector('textarea[name="review"]').value = '';
+            document.querySelector('input[name="is_liked"]').checked = false;
+        }
+    });
+});
 
 // Handle form submission
 document.getElementById('reading-log-form')?.addEventListener('submit', async function(e) {

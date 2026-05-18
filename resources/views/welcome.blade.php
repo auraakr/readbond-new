@@ -47,20 +47,22 @@
                 <a href="/books" class="text-purple-400 hover:text-purple-300 font-bold text-sm">View All →</a>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach($popularBooks as $book)
                     <div class="group cursor-pointer">
-                        <div class="aspect-[3/4] rounded-sm overflow-hidden bg-slate-800 mb-4 shadow-md group-hover:ring-1 group-hover:ring-purple-200 transition-all">
-                            @if(isset($book['cover_i']))
-                                <img src="https://covers.openlibrary.org/b/id/{{ $book['cover_i'] }}-M.jpg" 
+                        <div class="aspect-[3/5] rounded-sm overflow-hidden bg-slate-800 mb-4 shadow-md group-hover:ring-1 group-hover:ring-purple-200 transition-all">
+                            @if($book->cover)
+                                <img 
+                                    src="{{ $book->cover }}"
+                                    alt="{{ $book->title }}"
                                     class="w-full h-full object-cover transition duration-500" 
-                                    alt="{{ $book['title'] }}">
+                                />
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-slate-500 text-xs p-4 text-center">No Cover Available</div>
                             @endif
                         </div>
-                        <h3 class="text-white font-bold text-sm truncate">{{ $book['title'] }}</h3>
-                        <p class="text-slate-500 text-xs truncate">{{ $book['author_name'][0] ?? 'Unknown Author' }}</p>
+                        <h3 class="text-white font-bold text-sm truncate">{{ $book->title }}</h3>
+                        <p class="text-slate-500 text-xs truncate">{{ $book->author_name ?? 'Unknown Author' }}</p>
                     </div>
                 @endforeach
             </div>

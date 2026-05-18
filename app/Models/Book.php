@@ -56,6 +56,11 @@ class Book extends Model
         return $this->hasMany(ReadingLog::class);
     }
 
+    public function reviews()
+    {
+        return $this->hasMany(BookReview::class);
+    }
+
     public function collections()
     {
         return $this->belongsToMany(Collection::class, 'collection_book')

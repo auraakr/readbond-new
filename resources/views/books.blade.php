@@ -108,7 +108,7 @@
             @foreach($books as $book)
                 <a href="{{ route('books.show', $book->external_id) }}" class="group flex flex-col">
                     {{-- Cover --}}
-                    <div class="aspect-[3/4] bg-slate-800 rounded-sm overflow-hidden mb-3
+                    <div class="aspect-[3/5] bg-slate-800 rounded-sm overflow-hidden mb-3
                                 border border-slate-700
                                 group-hover:border-purple-100">
                         @if($book->cover)

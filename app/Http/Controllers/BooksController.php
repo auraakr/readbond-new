@@ -12,6 +12,7 @@ use App\Models\BookLike;
 use App\Models\BookRating;
 use App\Models\BookReadlist;
 use App\Models\ReadingLog;
+use App\Models\BookReview;
 
 class BooksController extends Controller
 {
@@ -79,6 +80,9 @@ class BooksController extends Controller
         // Get trending genres
         $trendingGenres = $this->getTrendingGenres();
 
+        // Get recent reviews
+        $recentReviews = $this->getRecentReviews();
+
         $filters = [
             'search' => $query,
             'genre' => $genre,
@@ -86,7 +90,7 @@ class BooksController extends Controller
             'sort' => $sort,
         ];
 
-        return view('books', compact('books', 'popularBooks', 'trendingGenres', 'filters'));
+        return view('books', compact('books', 'popularBooks', 'trendingGenres', 'recentReviews', 'filters'));
     }
 
     /**
@@ -148,6 +152,34 @@ class BooksController extends Controller
     }
 
     /**
+     * Get recent reviews with book and user info
+     */
+    private function getRecentReviews($limit = 6)
+    {
+        return Cache::remember('recent_reviews', 1800, function () use ($limit) {
+            return BookReview::with(['book', 'user'])
+                ->where('rating', '>', 0)
+                ->latest()
+                ->limit($limit)
+                ->get()
+                ->map(function ($review) {
+                    return [
+                        'id' => $review->id,
+                        'user_name' => $review->user->name,
+                        'rating' => $review->rating,
+                        'review' => $review->review,
+                        'is_liked' => $review->is_liked,
+                        'created_at' => $review->created_at->diffForHumans(),
+                        'book_title' => $review->book->title,
+                        'book_cover' => $review->book->cover,
+                        'book_url' => route('books.show', $review->book->external_id),
+                    ];
+                })
+                ->toArray();
+        });
+    }
+
+    /**
      * Show book detail
      */
     public function show($external_id)
@@ -185,13 +217,32 @@ class BooksController extends Controller
         // Similar books (based on genre/subject)
         $similarBooks = $this->getSimilarBooks($book, 6);
 
+        // Get reviews for this book
+        $reviews = $book->reviews()
+            ->with('user')
+            ->where('rating', '>', 0)
+            ->latest()
+            ->get()
+            ->map(function ($review) {
+                return [
+                    'id' => $review->id,
+                    'user_name' => $review->user->name,
+                    'user_avatar' => $review->user->avatar,
+                    'rating' => $review->rating,
+                    'review' => $review->review,
+                    'is_liked' => $review->is_liked,
+                    'created_at' => $review->created_at->diffForHumans(),
+                ];
+            });
+
         $stats = [
             'likes_count' => $book->likes()->count(),
             'ratings_count' => $book->ratings()->count(),
             'readers_count' => $book->readingLogs()->whereIn('status', ['reading', 'finished'])->distinct('user_id')->count(),
+            'reviews_count' => $reviews->count(),
         ];
 
-        return view('book-detail', compact('book', 'similarBooks', 'userLiked', 'userRating', 'userInReadlist', 'userReadingLog', 'userCollections', 'stats'));
+        return view('book-detail', compact('book', 'similarBooks', 'reviews', 'userLiked', 'userRating', 'userInReadlist', 'userReadingLog', 'userCollections', 'stats'));
     }
 
     /**
@@ -416,7 +467,9 @@ class BooksController extends Controller
             'status'      => 'required|in:want_to_read,reading,finished',
             'started_at'  => 'nullable|date',
             'finished_at' => 'nullable|date|after_or_equal:started_at',
-            'notes'       => 'nullable|string|max:1000',
+            'rating'      => 'nullable|integer|min:1|max:5',
+            'review'      => 'nullable|string|max:5000',
+            'is_liked'    => 'nullable|boolean',
         ]);
 
         // Handle both numeric ID and external_id
@@ -434,9 +487,23 @@ class BooksController extends Controller
                 'status'      => $request->status,
                 'started_at'  => $request->started_at,
                 'finished_at' => $request->finished_at,
-                'notes'       => $request->notes,
             ]
         );
+
+        // Save review if status is finished and has rating
+        if ($request->status === 'finished' && $request->rating) {
+            BookReview::updateOrCreate(
+                ['user_id' => Auth::id(), 'book_id' => $book->id],
+                [
+                    'rating'   => $request->rating,
+                    'review'   => $request->review,
+                    'is_liked' => $request->boolean('is_liked', false),
+                ]
+            );
+            
+            // Clear cache untuk recent reviews
+            Cache::forget('recent_reviews');
+        }
 
         if ($request->wantsJson()) {
             return response()->json(['success' => true, 'status' => $request->status]);
