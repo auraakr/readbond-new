@@ -594,14 +594,14 @@ async function toggleLikeReview(reviewId) {
                 // Hapus class default (slate)
                 btn.classList.remove('text-slate-400', 'hover:text-slate-300');
                 // Tambahkan class aktif (rose/pink)
-                btn.classList.add('bg-rose-500/10', 'border-rose-500/30', 'text-rose-400', 'hover:bg-rose-500/20');
+                btn.classList.add('text-rose-400', 'font-bold');
                 
                 // Warnai icon SVG heart
                 svg.classList.remove('fill-none');
                 svg.classList.add('fill-current');
             } else {
                 // Hapus class aktif (rose/pink)
-                btn.classList.remove('bg-rose-500/10', 'border-rose-500/30', 'text-rose-400', 'hover:bg-rose-500/20');
+                btn.classList.add('text-rose-400', 'font-bold');
                 // Kembalikan ke class default (slate)
                 btn.classList.add('text-slate-400', 'hover:text-slate-300');
                 

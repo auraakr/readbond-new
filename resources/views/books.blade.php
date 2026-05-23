@@ -18,13 +18,13 @@
                 id="search-input"
                 value="{{ $filters['search'] }}"
                 placeholder="Cari judul, penulis, atau ISBN..."
-                class="w-full bg-slate-800 border border-slate-700 text-white rounded-xl py-3 pl-12 pr-4
+                class="w-full bg-slate-800 border border-slate-700 text-white rounded-sm py-3 pl-12 pr-4
                        focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition placeholder-slate-500"
             >
 
             {{-- Autocomplete Dropdown --}}
             <div id="autocomplete-box"
-                 class="absolute z-50 w-full mt-2 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl hidden overflow-hidden">
+                 class="absolute z-50 w-full mt-2 bg-slate-800 border border-slate-700 rounded-sm shadow-2xl hidden overflow-hidden">
             </div>
         </form>
     </div>
