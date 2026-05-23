@@ -108,7 +108,7 @@
             @foreach($books as $book)
                 <a href="{{ route('books.show', $book->external_id) }}" class="group flex flex-col">
                     {{-- Cover --}}
-                    <div class="aspect-[3/5] bg-slate-800 rounded-sm overflow-hidden mb-3
+                    <div class="aspect-[2/3] bg-slate-800 rounded-sm overflow-hidden mb-3
                                 border border-slate-700
                                 group-hover:border-purple-100">
                         @if($book->cover)
@@ -161,11 +161,132 @@
         <x-heroicon-o-chat-bubble-left-ellipsis class="w-5 h-5 text-purple-400" />
         Just Reviewed
     </h2>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5">
-        {{-- Loop data review nanti --}}
-        <p class="text-slate-600 text-sm col-span-full">Belum ada review terbaru.</p>
+    <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-10 gap-2">
+        @forelse($recentReviews as $review)
+            <div class="flex flex-col gap-2 group">
+                {{-- Cover Buku Container --}}
+                <div class="relative aspect-[2/3] w-full rounded-sm overflow-hidden border border-white/5 bg-slate-900 shadow-md group-hover:border-purple-100 group-hover:shadow-lg group-hover:shadow-purple-500/5 transition-all duration-300">
+                    @if(!empty($review['book_cover']))
+                        <img src="{{ $review['book_cover'] }}" alt="{{ $review['book_title'] }}" class="w-full h-full object-cover">
+                    @else
+                        {{-- Fallback Cover jika cover kosong --}}
+                        <div class="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-slate-800 to-slate-900">
+                            <span class="text-xs font-bold text-slate-400 line-clamp-3 leading-tight">{{ $review['book_title'] ?? 'Untitled' }}</span>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Meta Reviewer & Rating --}}
+                <div class="flex flex-col gap-1 px-1">
+                    {{-- User Avatar & Name --}}
+                    <div class="flex items-center gap-2 min-w-0">
+                        {{-- Default Avatar bulatan inisial nama ala ReadBond --}}
+                        <div class="w-4 h-4 rounded-full bg-purple-600/30 flex items-center justify-center text-[8px] text-purple-400 font-bold uppercase flex-shrink-0">
+                            {{ substr($review['user_name'] ?? 'U', 0, 1) }}
+                        </div>
+                        <span class="text-xs text-slate-400 font-medium truncate group-hover:text-slate-200 transition-colors" title="{{ $review['user_name'] }}">
+                            {{ $review['user_name'] ?? 'Anonymous' }}
+                        </span>
+                    </div>
+
+                    {{-- Rating Stars & Like Dropdown --}}
+                    <div class="flex items-center justify-between gap-1">
+                        @if(!empty($review['rating']))
+                            <div class="flex items-center text-amber-400 text-[10px] tracking-tighter">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $review['rating'])
+                                        ★
+                                    @else
+                                        <span class="text-slate-700">★</span>
+                                    @endif
+                                @endfor
+                            </div>
+                        @endif
+
+                        {{-- Icon Heart jika review di-like --}}
+                        @if(!empty($review['is_liked']))
+                            <span class="text-rose-500 text-[10px]">❤️</span>
+                        @endif
+                    </div>
+                    
+                    {{-- Waktu Review (Opsional, kecil samar di bawah) --}}
+                    <span class="text-[9px] text-slate-600 font-light">{{ $review['created_at'] }}</span>
+                </div>
+            </div>
+        @empty
+            <p class="text-slate-600 text-sm col-span-full py-8 text-center border border-dashed border-slate-800 rounded-2xl">
+                Belum ada review terbaru.
+            </p>
+        @endforelse
     </div>
 
+    {{-- ─── 5. POPULAR REVIEWS ─── --}}
+    <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2 mt-12">
+        <x-heroicon-o-fire class="w-5 h-5 text-orange-500" />
+        Popular Reviews
+    </h2>
+
+    <div class="grid grid-cols-1 gap-5">
+        @forelse($popularReviews as $review)
+            <div class="flex gap-2 group items-start">
+                {{-- Cover Buku Container --}}
+                <div class="w-32 aspect-[2/3] rounded-sm overflow-hidden border border-white/5 bg-slate-900 shadow-md group-hover:border-purple-500/40 group-hover:shadow-lg group-hover:shadow-orange-500/5 transition-all duration-300">
+                    @if(!empty($review['book_cover']))
+                    <a href="{{ $review['book_url'] }}">
+                        <img src="{{ $review['book_cover'] }}" alt="{{ $review['book_title'] }}" class="w-full h-full object-cover">
+                    </a>
+                    @else
+                        {{-- Fallback Cover --}}
+                        <div class="w-full h-full flex flex-col items-center justify-center p-3 text-center bg-gradient-to-b from-slate-800 to-slate-900">
+                            <span class="text-xs font-bold text-slate-400 line-clamp-3 leading-tight">{{ $review['book_title'] }}</span>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- Meta Reviewer & Rating --}}
+                <div class="w-full px-1">
+                    {{-- User Avatar & Name --}}
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <div class="w-10 h-10 rounded-full bg-orange-600/30 flex items-center justify-center text-[8px] text-orange-400 font-bold uppercase flex-shrink-0">
+                                {{ substr($review['user_name'] ?? 'U', 0, 1) }}
+                            </div>
+                            <span class="text-sm text-slate-400 font-medium truncate group-hover:text-slate-200 transition-colors" title="{{ $review['user_name'] }}">
+                                {{ $review['user_name'] }}
+                            </span>
+                        </div>
+                        {{-- Rating Stars & Total Likes Info --}}
+                        <div class="flex items-center gap-3 mt-0.5">
+                            @if(!empty($review['rating']))
+                                <div class="flex items-center text-amber-400 text-md tracking-tighter">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        @if($i <= $review['rating'])
+                                            ★
+                                        @else
+                                            <span class="text-slate-700">★</span>
+                                        @endif
+                                    @endfor
+                                </div>
+                            @endif
+
+                            {{-- Jumlah Like Terbanyak --}}
+                            <div class="flex items-center text-rose-400 text-md font-semibold">
+                                <span>❤️</span>
+                                <span>{{ $review['likes_count'] }} Likes</span>
+                            </div>
+                        </div>
+                        <p class="text-md text-slate-300 font-light leading-relaxed line-clamp-6">
+                            "{{ $review['review'] ?? 'No thoughts recorded.' }}"
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <p class="text-slate-600 text-sm col-span-full py-8 text-center border border-dashed border-slate-800 rounded-2xl">
+                Belum ada review populer saat ini.
+            </p>
+        @endforelse
+    </div>
 </div>
 
 {{-- ─── AUTOCOMPLETE SCRIPT ─── --}}

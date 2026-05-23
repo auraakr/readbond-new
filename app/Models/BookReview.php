@@ -29,4 +29,11 @@ class BookReview extends Model
     {
         return $this->belongsTo(Book::class);
     }
+
+    public function likes()
+    {
+        return $this->belongsToMany(User::class, 'book_review_likes', 'book_review_id', 'user_id')
+                    ->withTimestamps();
+    }
+
 }

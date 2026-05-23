@@ -50,7 +50,7 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 @foreach($popularBooks as $book)
                     <div class="group cursor-pointer">
-                        <div class="aspect-[3/5] rounded-sm overflow-hidden bg-slate-800 mb-4 shadow-md group-hover:ring-1 group-hover:ring-purple-200 transition-all">
+                        <div class="aspect-[2/3] rounded-sm overflow-hidden bg-slate-800 mb-4 shadow-md group-hover:ring-1 group-hover:ring-purple-200 transition-all">
                             @if($book->cover)
                                 <img 
                                     src="{{ $book->cover }}"
@@ -80,7 +80,7 @@
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-12 gap-2">
                 @foreach($mostReviewed as $book)
                     <div class="group cursor-pointer">
-                        <div class="aspect-[3/4] rounded-sm overflow-hidden bg-slate-800 mb-4 shadow-md group-hover:ring-1 group-hover:ring-purple-200 transition-all">
+                        <div class="aspect-[2/3] rounded-sm overflow-hidden bg-slate-800 mb-4 shadow-md group-hover:ring-1 group-hover:ring-purple-200 transition-all">
                             @if(isset($book['cover_i']))
                                 <img src="https://covers.openlibrary.org/b/id/{{ $book['cover_i'] }}-M.jpg" 
                                     class="w-full h-full object-cover transition duration-500" 

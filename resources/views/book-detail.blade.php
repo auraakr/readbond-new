@@ -323,17 +323,6 @@
                                     <p class="text-slate-500 text-xs">{{ $review['created_at'] }}</p>
                                 </div>
                             </div>
-
-                            {{-- Like Badge --}}
-                            @if($review['is_liked'])
-                                <div class="flex items-center justify-center">
-                                    <div class="bg-red-500/20 border border-red-500/40 rounded-full p-1.5">
-                                        <svg class="w-3.5 h-3.5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            @endif
                         </div>
 
                         {{-- Rating Stars --}}
@@ -355,6 +344,31 @@
                                 {{ $review['review'] }}
                             </p>
                         @endif
+
+                        {{-- Dynamic Interaction Button (Like Review) --}}
+                        <div>
+                            @auth
+                                <button onclick="toggleLikeReview({{ $review['id'] }})" 
+                                        id="review-like-btn-{{ $review['id'] }}"
+                                        class="flex items-center gap-1.5 py-3 text-xs font-semibold transition
+                                        {{ $review['is_liked'] 
+                                            ? 'font-bold' 
+                                            : 'text-slate-400 hover:text-slate-300' }}">
+                                    <svg class="w-5 h-5 {{ $review['is_liked'] ? 'fill-current' : 'fill-none' }}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                    </svg>
+                                    <span id="review-like-count-{{ $review['id'] }}">{{ $review['likes_count'] ?? 0 }} Likes</span>
+                                </button>
+                            @else
+                                <a href="{{ route('login') }}" 
+                                    class="flex items-center gap-1.5 px-3 py-1.5 border text-slate-400 rounded-full text-xs hover:text-slate-300 transition">
+                                    <svg class="w-5 h-5 fill-none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                    </svg>
+                                    <span>{{ $review['likes_count'] ?? 0 }} Likes</span>
+                                </a>
+                            @endauth
+                        </div>
                     </div>
                 @empty
                     <div class="text-center py-10 text-slate-500">
@@ -414,6 +428,8 @@
         </div>
     </div>
 </div>
+
+{{-- Modal Collection --}}
 <div id="modal-collection"
      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
@@ -524,7 +540,7 @@ starBtns.forEach(btn => {
     });
 });
 
-// ── Toggle Like (AJAX) ──
+// ── Toggle Like Buku (AJAX) ──
 let isLiked = {{ $userLiked ? 'true' : 'false' }};
 async function toggleLike() {
     try {
@@ -543,6 +559,60 @@ async function toggleLike() {
         btn.classList.toggle('border-slate-600', !isLiked);
         btn.classList.toggle('text-slate-300', !isLiked);
     } catch(e) { console.error(e); }
+}
+
+// ── Toggle Like Review (AJAX) ──
+async function toggleLikeReview(reviewId) {
+    try {
+        const res = await fetch(`/reviews/${reviewId}/like`, {
+            method: 'POST',
+            headers: { 
+                'X-CSRF-TOKEN': '{{ csrf_token() }}', 
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+        });
+        
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        
+        if (data.success) {
+            const btn = document.getElementById(`review-like-btn-${reviewId}`);
+            const countLabel = document.getElementById(`review-like-count-${reviewId}`);
+            const svg = btn.querySelector('svg');
+            
+            // Update teks jumlah likes tanpa menghilangkan kata "Likes"
+            if (countLabel) {
+                countLabel.textContent = `${data.likes_count} Likes`;
+            }
+            
+            // Sinkronisasi class Tailwind dengan state is_liked terbaru
+            if (data.is_liked) {
+                // Hapus class default (slate)
+                btn.classList.remove('text-slate-400', 'hover:text-slate-300');
+                // Tambahkan class aktif (rose/pink)
+                btn.classList.add('bg-rose-500/10', 'border-rose-500/30', 'text-rose-400', 'hover:bg-rose-500/20');
+                
+                // Warnai icon SVG heart
+                svg.classList.remove('fill-none');
+                svg.classList.add('fill-current');
+            } else {
+                // Hapus class aktif (rose/pink)
+                btn.classList.remove('bg-rose-500/10', 'border-rose-500/30', 'text-rose-400', 'hover:bg-rose-500/20');
+                // Kembalikan ke class default (slate)
+                btn.classList.add('text-slate-400', 'hover:text-slate-300');
+                
+                // Kosongkan kembali warna icon SVG heart
+                svg.classList.remove('fill-current');
+                svg.classList.add('fill-none');
+            }
+        }
+    } catch(e) { 
+        console.error("Gagal mengeksekusi like review:", e); 
+    }
 }
 
 // ── Toggle Readlist (AJAX) ──

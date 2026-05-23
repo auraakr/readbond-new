@@ -13,6 +13,7 @@ use App\Models\BookRating;
 use App\Models\BookReadlist;
 use App\Models\ReadingLog;
 use App\Models\BookReview;
+use App\Models\BookReviewLike;
 
 class BooksController extends Controller
 {
@@ -83,6 +84,9 @@ class BooksController extends Controller
         // Get recent reviews
         $recentReviews = $this->getRecentReviews();
 
+        // get popular reviews
+        $popularReviews = $this->getPopularReviews();
+
         $filters = [
             'search' => $query,
             'genre' => $genre,
@@ -90,7 +94,7 @@ class BooksController extends Controller
             'sort' => $sort,
         ];
 
-        return view('books', compact('books', 'popularBooks', 'trendingGenres', 'recentReviews', 'filters'));
+        return view('books', compact('books', 'popularBooks', 'trendingGenres', 'recentReviews', 'popularReviews', 'filters'));
     }
 
     /**
@@ -159,6 +163,7 @@ class BooksController extends Controller
         return Cache::remember('recent_reviews', 1800, function () use ($limit) {
             return BookReview::with(['book', 'user'])
                 ->where('rating', '>', 0)
+                ->withCount('likes') // Menghitung total relasi 'likes' pada model BookReview
                 ->latest()
                 ->limit($limit)
                 ->get()
@@ -169,6 +174,34 @@ class BooksController extends Controller
                         'rating' => $review->rating,
                         'review' => $review->review,
                         'is_liked' => $review->is_liked,
+                        'likes_count' => $review->likes_count,
+                        'created_at' => $review->created_at->diffForHumans(),
+                        'book_title' => $review->book->title,
+                        'book_cover' => $review->book->cover,
+                        'book_url' => route('books.show', $review->book->external_id),
+                    ];
+                })
+                ->toArray();
+        });
+    }
+
+    private function getPopularReviews($limit = 6)
+    {
+        // Menggunakan cache selama 30 menit (1800 detik) agar tidak membebani database
+        return Cache::remember('popular_reviews', 1800, function () use ($limit) {
+            return BookReview::with(['book', 'user'])
+                ->where('rating', '>', 0)
+                ->withCount('likes') // Menghitung total relasi 'likes' pada model BookReview
+                ->orderBy('likes_count', 'desc') // Urutkan dari yang paling banyak di-like
+                ->limit($limit)
+                ->get()
+                ->map(function ($review) {
+                    return [
+                        'id' => $review->id,
+                        'user_name' => $review->user->name,
+                        'rating' => $review->rating,
+                        'review' => $review->review,
+                        'likes_count' => $review->likes_count, // Menyimpan total jumlah likes
                         'created_at' => $review->created_at->diffForHumans(),
                         'book_title' => $review->book->title,
                         'book_cover' => $review->book->cover,
@@ -204,6 +237,7 @@ class BooksController extends Controller
         $userInReadlist = false;
         $userReadingLog = null;
         $userCollections = collect();
+        $currentUserId  = Auth::id(); // Ambil ID User yang sedang login
 
         if (Auth::check()) {
             $user           = Auth::user();
@@ -217,10 +251,15 @@ class BooksController extends Controller
         // Similar books (based on genre/subject)
         $similarBooks = $this->getSimilarBooks($book, 6);
 
-        // Get reviews for this book
+        // ── PERBAIKAN DI SINI ──
+        // Mengambil reviews beserta hitungan jumlah likes & status like user yang login
         $reviews = $book->reviews()
             ->with('user')
             ->where('rating', '>', 0)
+            ->withCount('likes') // Menghitung otomatis kolom 'likes_count'
+            ->withExists(['likes' => function ($query) use ($currentUserId) {
+                $query->where('user_id', $currentUserId); // Mengecek kolom 'likes_exists' (true/false)
+            }])
             ->latest()
             ->get()
             ->map(function ($review) {
@@ -230,7 +269,11 @@ class BooksController extends Controller
                     'user_avatar' => $review->user->avatar,
                     'rating' => $review->rating,
                     'review' => $review->review,
-                    'is_liked' => $review->is_liked,
+                    
+                    // Masukkan hasil kueri ke dalam array pembungkus
+                    'is_liked' => $review->likes_exists, // Bernilai true jika user login sudah nge-like
+                    'likes_count' => $review->likes_count, // Bernilai angka riil jumlah like dari DB
+                    
                     'created_at' => $review->created_at->diffForHumans(),
                 ];
             });
@@ -385,20 +428,33 @@ class BooksController extends Controller
     // ── Toggle Like ──
     public function toggleLike(Request $request, $id)
     {
-        $book   = Book::findOrFail($id);
         $userId = Auth::id();
 
-        $existing = BookLike::where('user_id', $userId)->where('book_id', $id)->first();
+        // Pastikan user sudah login
+        if (!$userId) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Handle numeric ID maupun external_id
+        $book = null;
+        if (is_numeric($id)) {
+            $book = Book::findOrFail($id);
+        } else {
+            $book = Book::where('external_id', $id)->firstOrFail();
+        }
+
+        // Cari data like menggunakan ID internal database yang valid
+        $existing = BookLike::where('user_id', $userId)->where('book_id', $book->id)->first();
 
         if ($existing) {
             $existing->delete();
             $liked = false;
         } else {
-            BookLike::create(['user_id' => $userId, 'book_id' => $id]);
+            BookLike::create(['user_id' => $userId, 'book_id' => $book->id]);
             $liked = true;
         }
 
-        // Clear cache untuk popular books karena likes berubah
+        // Clear cache untuk popular books karena jumlah likes berubah
         Cache::forget('popular_books_homepage');
 
         if ($request->wantsJson()) {
@@ -416,10 +472,11 @@ class BooksController extends Controller
     {
         $request->validate(['rating' => 'required|integer|min:1|max:5']);
 
-        $book = Book::findOrFail($id);
+        // Handle numeric ID maupun external_id
+        $book = is_numeric($id) ? Book::findOrFail($id) : Book::where('external_id', $id)->firstOrFail();
 
         BookRating::updateOrCreate(
-            ['user_id' => Auth::id(), 'book_id' => $id],
+            ['user_id' => Auth::id(), 'book_id' => $book->id],
             ['rating'  => $request->rating]
         );
 
@@ -440,16 +497,18 @@ class BooksController extends Controller
     // ── Toggle Readlist ──
     public function toggleReadlist(Request $request, $id)
     {
-        $book   = Book::findOrFail($id);
         $userId = Auth::id();
+        
+        // Handle numeric ID maupun external_id
+        $book = is_numeric($id) ? Book::findOrFail($id) : Book::where('external_id', $id)->firstOrFail();
 
-        $existing = BookReadlist::where('user_id', $userId)->where('book_id', $id)->first();
+        $existing = BookReadlist::where('user_id', $userId)->where('book_id', $book->id)->first();
 
         if ($existing) {
             $existing->delete();
             $inReadlist = false;
         } else {
-            BookReadlist::create(['user_id' => $userId, 'book_id' => $id]);
+            BookReadlist::create(['user_id' => $userId, 'book_id' => $book->id]);
             $inReadlist = true;
         }
 
@@ -477,7 +536,6 @@ class BooksController extends Controller
         if (is_numeric($id)) {
             $book = Book::findOrFail($id);
         } else {
-            // Try to find by external_id
             $book = Book::where('external_id', $id)->firstOrFail();
         }
 
@@ -501,8 +559,9 @@ class BooksController extends Controller
                 ]
             );
             
-            // Clear cache untuk recent reviews
+            // --- PERBAIKAN: Hapus duplikasi pembersihan cache di sini ---
             Cache::forget('recent_reviews');
+            Cache::forget('popular_reviews');
         }
 
         if ($request->wantsJson()) {
@@ -530,5 +589,44 @@ class BooksController extends Controller
         }
 
         return back()->with('success', "Buku ditambahkan ke koleksi \"{$collection->title}\"!");
+    }
+
+    public function toggleLikeReview(Request $request, $id)
+    {
+        $userId = Auth::id();
+
+        if (!$userId) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Mencari review berdasarkan ID
+        $review = BookReview::findOrFail($id);
+
+        // Memeriksa apakah user sudah pernah nge-like review ini
+        // (Asumsi: model BookReview memiliki relasi bernama 'likes')
+        $existing = $review->likes()->where('user_id', $userId)->first();
+
+        if ($existing) {
+            $review->likes()->detach($userId);
+            $isLiked = false;
+        } else {
+            $review->likes()->attach($userId);
+            $isLiked = true;
+        }
+
+        // Bersihkan cache yang menampung data review agar langsung ter-update
+        Cache::forget('book_reviews');
+        Cache::forget('recent_reviews');
+        Cache::forget('popular_reviews');
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'is_liked' => $isLiked,
+                'likes_count' => $review->likes()->count(),
+            ]);
+        }
+
+        return back();
     }
 }
