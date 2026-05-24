@@ -103,20 +103,31 @@ Route::middleware('auth')->group(function () {
 
     // Book Club Features
     Route::prefix('clubs')->name('clubs.')->group(function () {
-        // Navigasi Index & Show
+        
+        // 1. Rute Statis Utama (Wajib di Atas agar Tidak Tertabrak Slug)
         Route::get('/', [BookClubController::class, 'index'])->name('index');
         Route::get('/create', [BookClubController::class, 'create'])->name('create');
         Route::post('/', [BookClubController::class, 'store'])->name('store');
-        Route::get('/{slug}', [BookClubController::class, 'show'])->name('show');
-        
-        /// Manajemen Dashboard Setting (Moderator Only)
-        Route::get('/{slug}/edit', [BookClubController::class, 'edit'])->name('edit');
+
+        // 2. Rute Menggunakan ID Global (Aman Ditulis di Sini)
         Route::put('/{id}', [BookClubController::class, 'update'])->name('update');
         Route::post('/{id}/add-moderator', [BookClubController::class, 'addModerator'])->name('add-moderator');
-
-        // Toggle Join/Leave via AJAX Button
         Route::post('/{id}/toggle-join', [BookClubController::class, 'toggleJoin'])->name('toggle-join');
 
+        // 3. Rute Berbasis Slug Klub & Fitur Internal Sub-Mendasar (Nested)
+        Route::prefix('{slug}')->group(function () {
+            // Halaman Utama & Edit Klub
+            Route::get('/', [BookClubController::class, 'show'])->name('show');
+            Route::get('/edit', [BookClubController::class, 'edit'])->name('edit');
+            
+            // Sub-Fitur: Diskusi Internal Klub (Sekarang Menerima $clubSlug Otomatis)
+            Route::get('/discussion/create', [BookClubController::class, 'createDiscussion'])->name('discussion.create');
+            Route::post('/discussion', [BookClubController::class, 'storeDiscussion'])->name('discussion.store');
+            Route::get('/discussion/{discussion}', [BookClubController::class, 'showDiscussion'])->name('discussion.show');
+            
+            // Sub-Fitur: Balasan Post di Dalam Diskusi
+            Route::post('/discussion/{discussion}/posts', [BookClubController::class, 'storePost'])->name('discussion.posts.store');
+        });
     });
     /**
      * CATCH-ALL ROUTE (WAJIB PALING BAWAH)

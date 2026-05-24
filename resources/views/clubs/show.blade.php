@@ -132,15 +132,15 @@
 
         {{-- ─── SECTION: DISCUSSIONS BOARD ─── --}}
         <div class="border-t border-slate-800 pt-6">
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex justify-between items-center py-6">
                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Discussions Board</h3>
                 @if($isMember || $isModerator)
-                    <button class="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 text-xs font-bold transition">
+                    <a href="{{ route('clubs.discussion.create', $club->slug) }}" class="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 text-xs font-bold transition">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
                         New Thread
-                    </button>
+                    </a >
                 @endif
             </div>
 
@@ -149,7 +149,7 @@
                 @forelse($discussions as $discussion)
                     <div class="py-3.5 flex justify-between items-center group">
                         <div class="min-w-0 pr-4">
-                            <a href="#" class="block text-sm font-semibold text-white group-hover:text-purple-300 transition truncate">
+                            <a href="{{ route('clubs.discussion.show', ['slug' => $club->slug, 'discussion' => $discussion->id]) }}" class="block text-sm font-semibold text-white group-hover:text-purple-300 transition truncate">
                                 {{ $discussion->title }}
                             </a>
                             <span class="text-[10px] text-slate-500 block mt-0.5">Dimulai oleh {{ $discussion->user->username ?? 'Anggota' }}</span>

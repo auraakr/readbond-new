@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use App\Models\BookClub;
 use App\Models\BookClubDiscussion;
+use App\Models\BookClubPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -204,5 +206,88 @@ class BookClubController extends Controller
         $club->members()->updateExistingPivot($targetUserId, ['role' => 'moderator']);
 
         return back()->with('success', 'Berhasil mengangkat moderator baru!');
+    }
+
+    public function createDiscussion($clubSlug)
+    {
+        $club = BookClub::where('slug', $clubSlug)->firstOrFail();
+        
+        $isModerator = $club->members()->where('user_id', Auth::id())->where('book_club_members.role', 'moderator')->exists();
+        if (!$club->allow_member_add_discussion && !$isModerator) {
+            return redirect()->route('clubs.show', $club->slug)
+                            ->with('error', 'Hanya moderator yang dapat membuat diskusi baru.');
+        }
+
+        // Ambil semua buku untuk pilihan drop-down (bisa ditambah limit atau pagination jika sudah banyak)
+        $books = Book::orderBy('title', 'asc')->get();
+
+        return view('clubs.discussion.create', compact('club', 'books'));
+    }
+
+    public function storeDiscussion(Request $request, $clubSlug)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'book_id' => 'nullable|exists:books,id', // Validasi optional, harus ada di tabel books jika diisi
+        ]);
+
+        $club = BookClub::where('slug', $clubSlug)->firstOrFail();
+
+        // Buat Discussion Thread beserta book_id (jika dipilih)
+        $discussion = BookClubDiscussion::create([
+            'book_club_id' => $club->id,
+            'user_id' => Auth::id(),
+            'title' => $request->title,
+            'book_id' => $request->book_id, // Menyimpan relasi buku (bisa bernilai null)
+        ]);
+
+        // Buat data Post Pertama
+        BookClubPost::create([
+            'discussion_id' => $discussion->id,
+            'user_id' => Auth::id(),
+            'content' => $request->content,
+        ]);
+
+        return redirect()->route('clubs.discussion.show', [$club->slug, $discussion->id])
+                        ->with('success', 'Topik diskusi berhasil diterbitkan!');
+    }
+
+    // 3. SHOW DISCUSSION (Tetap pakai Slug)
+    public function showDiscussion($clubSlug, $discussionId)
+    {
+        $club = BookClub::where('slug', $clubSlug)->firstOrFail();
+        
+        $discussion = BookClubDiscussion::with(['user', 'posts.user'])
+            ->where('book_club_id', $club->id)
+            ->findOrFail($discussionId);
+
+        $isMember = $club->members()->where('user_id', Auth::id())->exists();
+
+        return view('clubs.discussion.show', compact('club', 'discussion', 'isMember'));
+    }
+
+    // 4. STORE POST / REPLY (Ubah dari ID ke Slug)
+    public function storePost(Request $request, $clubSlug, $discussionId)
+    {
+        $request->validate([
+            'content' => 'required|string',
+        ]);
+
+        // Cari pakai slug
+        $club = BookClub::where('slug', $clubSlug)->firstOrFail();
+        
+        $isMember = $club->members()->where('user_id', Auth::id())->exists();
+        if (!$isMember) {
+            return back()->with('error', 'Anda harus menjadi anggota klub untuk membalas diskusi.');
+        }
+
+        BookClubPost::create([
+            'discussion_id' => $discussionId,
+            'user_id' => Auth::id(),
+            'content' => $request->content,
+        ]);
+
+        return back()->with('success', 'Balasan Anda telah diposting!');
     }
 }
