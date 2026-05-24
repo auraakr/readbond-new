@@ -95,39 +95,105 @@
         </div>
 
         {{-- ─── SECTION: CURRENTLY READING ─── --}}
-        <div class="mb-10 border-t border-slate-800 pt-6">
-            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Currently reading</h3>
+        <div class="mb-10 border-t border-slate-800 pt-6" x-data="{ openAddBookModal: false }">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Currently reading</h3>
+                
+                {{-- Tombol Tambah Buku (Hanya muncul jika diizinkan / Moderator) --}}
+                @if($club->allow_member_add_book || (Auth::check() && $club->members()->where('user_id', Auth::id())->where('book_club_members.role', 'moderator')->exists()))
+                    <button @click="openAddBookModal = true" onclick="openModal()" class="bg-slate-850 hover:bg-slate-800 text-purple-400 border border-purple-500/20 px-3 py-1 text-[11px] font-bold rounded-sm transition">
+                        + Add Book
+                    </button>
+                @endif
+            </div>
             
-            @if($club->currentBook)
-                <div class="flex gap-4 bg-slate-850 border border-slate-800 p-4 rounded-sm">
-                    <div class="w-16 h-24 bg-slate-800 border border-slate-700 rounded-sm relative flex-shrink-0 flex items-center justify-center overflow-hidden">
-                        <svg class="absolute inset-0 w-full h-full text-slate-700/20 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-                            <line x1="0" y1="0" x2="100" y2="100" stroke-width="0.5"/>
-                            <line x1="100" y1="0" x2="0" y2="100" stroke-width="0.5"/>
-                        </svg>
-                        @if($club->currentBook->cover)
-                            <img src="{{ $club->currentBook->cover }}" class="absolute inset-0 w-full h-full object-cover">
-                        @endif
-                    </div>
-                    <div class="text-xs text-slate-300 flex-1">
-                        <h4 class="font-bold text-white text-sm">{{ $club->currentBook->title }}</h4>
-                        <p class="text-slate-500 mt-0.5">by {{ $club->currentBook->author ?? 'Unknown Author' }}</p>
-                        <p class="mt-2 italic text-slate-400 bg-slate-900/40 p-2 border-l-2 border-purple-500 rounded-r-sm">
-                            "{{ $club->current_book_reason ?? 'Membaca bersama agenda pekan ini.' }}"
-                        </p>
-                        @if($club->current_book_finish_date)
-                            <p class="mt-2 text-purple-400 font-medium flex items-center gap-1">
-                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            {{-- Menggunakan relasi yang baru: $club->currentlyReading --}}
+            @if($club->currentlyReading->isNotEmpty())
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach($club->currentlyReading as $book)
+                        <div class="flex gap-4 bg-slate-850 border border-slate-800 p-4 rounded-sm relative group">
+                            
+                            {{-- Cover Buku --}}
+                            <div class="w-16 h-24 bg-slate-800 border border-slate-700 rounded-sm relative flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                <svg class="absolute inset-0 w-full h-full text-slate-700/20 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                                    <line x1="0" y1="0" x2="100" y2="100" stroke-width="0.5"/>
+                                    <line x1="100" y1="0" x2="0" y2="100" stroke-width="0.5"/>
                                 </svg>
-                                Finish date {{ \Carbon\Carbon::parse($club->current_book_finish_date)->diffInDays() }} days left
-                            </p>
-                        @endif
-                    </div>
+                                @if($book->cover_image)
+                                    <img src="{{ asset('storage/' . $book->cover_image) }}" class="absolute inset-0 w-full h-full object-cover">
+                                @elseif($book->cover) {{-- Fallback jika ada kolom external link cover --}}
+                                    <img src="{{ $book->cover }}" class="absolute inset-0 w-full h-full object-cover">
+                                @endif
+                            </div>
+
+                            {{-- Data Detail Buku --}}
+                            <div class="text-xs text-slate-300 flex-1 flex flex-col justify-between">
+                                <div>
+                                    <h4 class="font-bold text-white text-sm line-clamp-1">{{ $book->title }}</h4>
+                                    <p class="text-slate-500 mt-0.5">by {{ $book->author ?? 'Unknown Author' }}</p>
+                                </div>
+
+                                <div class="flex justify-between items-center mt-3 pt-2 border-t border-slate-800/60">
+                                    <span class="text-[10px] text-slate-500">Added {{ $book->pivot->created_at->diffForHumans() }}</span>
+                                    
+                                    {{-- Aksi Cepat Selesaikan Baca (Hanya untuk Moderator) --}}
+                                    @if(Auth::check() && $club->members()->where('user_id', Auth::id())->where('book_club_members.role', 'moderator')->exists())
+                                        <form action="{{ route('clubs.books.status.update', [$club->slug, $book->id]) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="completed">
+                                            <button type="submit" class="text-[10px] font-bold text-purple-400 hover:text-purple-300 transition uppercase tracking-wide">
+                                                Mark Done ✓
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             @else
                 <p class="text-xs text-slate-500 italic">Belum ada buku yang diset untuk dibaca bersama saat ini.</p>
             @endif
+
+            {{-- ─── POP-UP MODAL: ADD BOOK TO CLUB ─── --}}
+            <div id="add-book-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+                {{-- Backdrop hitam transparan --}}
+                <div onclick="closeModal()" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
+                
+                {{-- Kotak Dialog --}}
+                <div class="bg-slate-850 border border-slate-800 w-full max-w-md rounded-sm p-6 relative z-10 shadow-xl">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
+                        <h4 class="text-sm font-bold text-white uppercase tracking-wider">Add Group Reading</h4>
+                        <button onclick="closeModal()" class="text-slate-500 hover:text-slate-300 text-sm">&times;</button>
+                    </div>
+
+                    <form action="{{ route('clubs.books.add', $club->slug) }}" method="POST" class="space-y-4">
+                        @csrf
+                        {{-- Input Status otomatis disembunyikan sebagai 'reading' --}}
+                        <input type="hidden" name="status" value="reading">
+
+                        <div>
+                            <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Select Book Katalog</label>
+                            <select name="book_id" required class="w-full bg-slate-900 text-slate-300 text-xs border border-slate-700 rounded-sm px-3 py-2.5 outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer">
+                                <option value="" disabled selected>Pilih buku yang tersedia di ReadBond...</option>
+                                @foreach($allBooks as $b) {{-- Dilempar via controller --}}
+                                    <option value="{{ $b->id }}">{{ $b->title }} ({{ $b->author_name }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="flex justify-end gap-3 pt-2">
+                            <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-white text-xs font-medium px-3 py-2 transition">
+                                Cancel
+                            </button>
+                            <button type="submit" class="bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs px-4 py-2 rounded-sm transition shadow-md shadow-purple-950/40">
+                                Add to List
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         {{-- ─── SECTION: DISCUSSIONS BOARD ─── --}}
@@ -212,6 +278,14 @@ async function toggleJoinClub(clubId) {
         // Kembalikan status tombol agar bisa diklik lagi
         joinBtn.disabled = false;
     }
+}
+
+function openModal() {
+    document.getElementById('add-book-modal').classList.remove('hidden');
+}
+
+function closeModal() {
+    document.getElementById('add-book-modal').classList.add('hidden');
 }
 </script>
 @endauth

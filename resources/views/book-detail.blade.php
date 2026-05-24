@@ -23,7 +23,7 @@
 
             {{-- Cover --}}
             <div class="mx-auto lg:mx-0 shrink-0">
-                <div class="w-44 lg:w-56 rounded-xl shadow-2xl shadow-black/60
+                <div class="w-44 lg:w-56 rounded-sm shadow-2xl shadow-black/60
                             overflow-hidden border border-white/10">
                     @if($book->cover)
                         <img src="{{ $book->cover }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
@@ -158,7 +158,7 @@
 
             {{-- Rate Card — desktop --}}
             <div class="hidden lg:block shrink-0 w-52">
-                <div class="bg-slate-800/80 border border-slate-700 rounded-xl p-5 backdrop-blur-sm">
+                <div class="bg-slate-800/80 border border-slate-700 rounded-sm p-5 backdrop-blur-sm">
                     <p class="text-[10px] text-slate-400 uppercase tracking-widest font-medium mb-3 text-center">
                         Beri Rating
                     </p>
@@ -273,7 +273,7 @@
 
             {{-- Tab: Author --}}
             <div id="tab-author" class="tab-content hidden">
-                <div class="flex items-center gap-4 p-5 bg-slate-800 rounded-xl border border-slate-700">
+                <div class="flex items-center gap-4 p-5 bg-slate-800 rounded-sm border border-slate-700">
                     <div class="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center
                                 text-slate-400 text-xl font-bold shrink-0">
                         {{ strtoupper(substr($book->author_name ?? 'U', 0, 1)) }}
@@ -383,7 +383,7 @@
 
         {{-- Mobile rate card --}}
         <div class="lg:hidden">
-            <div class="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <div class="bg-slate-800 border border-slate-700 rounded-sm p-5">
                 <p class="text-[10px] text-slate-400 uppercase tracking-widest font-medium mb-3 text-center">
                     Beri Rating
                 </p>
@@ -458,7 +458,7 @@
                         <button type="submit"
                                 class="w-full flex items-center justify-between px-4 py-3
                                        bg-slate-900 hover:bg-slate-700 border border-slate-700
-                                       hover:border-purple-500 rounded-xl transition text-left">
+                                       hover:border-purple-500 rounded-sm transition text-left">
                             <div>
                                 <p class="text-white text-sm font-medium">{{ $col->title }}</p>
                                 <p class="text-slate-500 text-xs mt-0.5">{{ $col->books_count ?? 0 }} buku</p>
@@ -471,7 +471,7 @@
             <a href="{{ route('collections.create') }}"
                class="block w-full py-2.5 border border-dashed border-slate-600 text-slate-400
                       hover:border-purple-500 hover:text-purple-300 text-sm text-center
-                      rounded-xl transition">
+                      rounded-sm transition">
                 + Buat Koleksi Baru
             </a>
         @endif

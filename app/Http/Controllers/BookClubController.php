@@ -30,7 +30,13 @@ class BookClubController extends Controller
     public function show($slug)
     {
         // 1. Ambil data club berdasarkan slug beserta eager load relasi currentBook
-        $club = BookClub::with('currentBook')->where('slug', $slug)->firstOrFail();
+        // Eager loading relasi members dan books sekaligus agar query ringan
+        $club = BookClub::with(['members', 'books' => function($query) {
+            $query->withPivot('created_at')->orderBy('book_club_books.created_at', 'desc');
+        }])->where('slug', $slug)->firstOrFail();
+
+        // Data untuk looping list di pop-up modal buku
+        $allBooks = Book::orderBy('title', 'asc')->get();
 
         // 2. Hitung jumlah anggota secara dinamis (jika belum di-handle di database/global scope)
         $club->members_count = $club->members()->count();
@@ -65,7 +71,7 @@ class BookClubController extends Controller
             ->get();
 
         // 6. Lempar semua variabel ke dalam view show
-        return view('clubs.show', compact('club', 'isModerator', 'isMember', 'discussions'));
+        return view('clubs.show', compact('club', 'allBooks', 'isModerator', 'isMember', 'discussions'));
     }
     
 
@@ -289,5 +295,61 @@ class BookClubController extends Controller
         ]);
 
         return back()->with('success', 'Balasan Anda telah diposting!');
+    }
+
+    public function addBook(Request $request, $clubSlug)
+    {
+        $request->validate([
+            'book_id' => 'required|exists:books,id',
+            'status' => 'required|in:reading,completed,plan_to_read'
+        ]);
+
+        $club = BookClub::where('slug', $clubSlug)->firstOrFail();
+
+        // Validasi Hak Akses: Cek apakah member biasa diizinkan menambah buku berdasarkan setting klub
+        $isModerator = $club->members()->where('user_id', Auth::id())->where('book_club_members.role', 'moderator')->exists();
+        if (!$club->allow_member_add_book && !$isModerator) {
+            return back()->with('error', 'Hanya moderator yang dapat menambahkan buku bersama di klub ini.');
+        }
+
+        // Cek apakah buku sudah ada di daftar dengan status tersebut
+        $exists = $club->books()->where('book_id', $request->book_id)->wherePivot('status', $request->status)->exists();
+        if ($exists) {
+            return back()->with('error', 'Buku ini sudah terdaftar di dalam list dengan status yang sama.');
+        }
+
+        // Hubungkan buku ke dalam tabel pivot book_club_books
+        $club->books()->attach($request->book_id, [
+            'status' => $request->status,
+            'added_by' => Auth::id(),
+            'created_at' => now(),
+            'updated_at' => now()
+        ]);
+
+        return back()->with('success', 'Buku berhasil ditambahkan ke daftar Baca Bersama!');
+    }
+
+    // ─── AXIS: UPDATE STATUS BACA BUKU (Contoh: Menandai Selesai) ───
+    public function updateBookStatus(Request $request, $clubSlug, $bookId)
+    {
+        $request->validate([
+            'status' => 'required|in:reading,completed,plan_to_read'
+        ]);
+
+        $club = BookClub::where('slug', $clubSlug)->firstOrFail();
+        
+        // Fitur update status umumnya dibatasi hanya untuk jajaran Moderator
+        $isModerator = $club->members()->where('user_id', Auth::id())->where('book_club_members.role', 'moderator')->exists();
+        if (!$isModerator) {
+            return back()->with('error', 'Hanya tindakan moderator yang dapat mengubah status baca bersama.');
+        }
+
+        // Update baris pivot statusnya
+        $club->books()->updateExistingPivot($bookId, [
+            'status' => $request->status,
+            'updated_at' => now()
+        ]);
+
+        return back()->with('success', 'Status baca bersama berhasil diperbarui!');
     }
 }

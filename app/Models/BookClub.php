@@ -44,4 +44,24 @@ class BookClub extends Model
     public function discussions() {
         return $this->hasMany(BookClubDiscussion::class);
     }
+
+    // Relasi ke semua buku yang terikat dengan Club ini
+    public function books()
+    {
+        return $this->belongsToMany(Book::class, 'book_club_books')
+                    ->withPivot('status', 'added_by')
+                    ->withTimestamps();
+    }
+
+    // Shortcut query untuk mengambil buku yang saat ini SEDANG DIBACA bersama
+    public function currentlyReading()
+    {
+        return $this->books()->wherePivot('status', 'reading');
+    }
+
+    // Shortcut query untuk mengambil daftar arsip buku yang SUDAH SELESAI dibaca bersama
+    public function completedBooks()
+    {
+        return $this->books()->wherePivot('status', 'completed');
+    }
 }

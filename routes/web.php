@@ -127,6 +127,9 @@ Route::middleware('auth')->group(function () {
             
             // Sub-Fitur: Balasan Post di Dalam Diskusi
             Route::post('/discussion/{discussion}/posts', [BookClubController::class, 'storePost'])->name('discussion.posts.store');
+
+            Route::post('/books/add', [BookClubController::class, 'addBook'])->name('books.add');
+            Route::patch('/books/{bookId}/status', [BookClubController::class, 'updateBookStatus'])->name('books.status.update');
         });
     });
     /**
