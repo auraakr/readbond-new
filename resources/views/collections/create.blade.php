@@ -20,11 +20,11 @@
 
         {{-- Validation errors --}}
         @if($errors->any())
-            <div class="mb-6 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+            <div class="mb-6 bg-red-500/10 border border-red-500/30 rounded-sm p-4">
                 <ul class="text-red-400 text-sm space-y-1">
                     @foreach($errors->all() as $error)
                         <li class="flex items-center gap-2">
-                            <span class="w-1 h-1 rounded-full bg-red-400 shrink-0"></span>
+                            <span class="w-1 h-1 rounded-sml bg-red-400 shrink-0"></span>
                             {{ $error }}
                         </li>
                     @endforeach
@@ -36,9 +36,9 @@
             @csrf
 
             {{-- ── SECTION 1: Info Koleksi ── --}}
-            <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-6 mb-6">
+            <div class="bg-slate-800/60 border border-slate-700 rounded-sm p-6 mb-6">
                 <h2 class="text-white font-bold text-base mb-5 flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-300 text-xs
+                    <span class="w-6 h-6 rounded-sm bg-purple-500/20 text-purple-300 text-xs
                                  flex items-center justify-center font-black">1</span>
                     Info Koleksi
                 </h2>
@@ -51,7 +51,7 @@
                     <input type="text" name="title" value="{{ old('title') }}"
                            placeholder="cth: My Favorite Fantasy Books"
                            maxlength="255"
-                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl
+                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-sm
                                   px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500
                                   focus:border-purple-500 placeholder-slate-600 transition
                                   @error('title') border-red-500 @enderror">
@@ -69,7 +69,7 @@
                     <textarea name="description" rows="3"
                               placeholder="Ceritakan tentang koleksimu..."
                               maxlength="1000"
-                              class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl
+                              class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-sm
                                      px-4 py-3 resize-none outline-none focus:ring-2 focus:ring-purple-500
                                      focus:border-purple-500 placeholder-slate-600 transition
                                      @error('description') border-red-500 @enderror">{{ old('description') }}</textarea>
@@ -87,7 +87,7 @@
                         Visibilitas
                     </label>
                     <select name="visibility" id="visibility"
-                            class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl
+                            class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-sm
                                 px-4 py-3 outline-none focus:ring-2 focus:ring-purple-500
                                 focus:border-purple-500 placeholder-slate-600 transition">
                         <option value="public" {{ old('visibility') === 'public' ? 'selected' : '' }}>
@@ -101,9 +101,9 @@
             </div>
 
             {{-- ── SECTION 2: Tambah Buku ── --}}
-            <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-6 mb-8">
+            <div class="bg-slate-800/60 border border-slate-700 rounded-sm p-6 mb-8">
                 <h2 class="text-white font-bold text-base mb-1 flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-full bg-purple-500/20 text-purple-300 text-xs
+                    <span class="w-6 h-6 rounded-sm bg-purple-500/20 text-purple-300 text-xs
                                  flex items-center justify-center font-black">2</span>
                     Tambah Buku<span class="text-red-400">*</span>
                 </h2>
@@ -118,14 +118,14 @@
                     </svg>
                     <input type="text" id="book-search"
                            placeholder="Cari judul buku untuk ditambahkan..."
-                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-xl
+                           class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-sm
                                   py-3 pl-10 pr-4 outline-none focus:ring-2 focus:ring-purple-500
                                   placeholder-slate-600 transition">
 
                     {{-- Dropdown hasil --}}
                     <div id="book-search-results"
                          class="absolute z-50 w-full mt-2 bg-slate-800 border border-slate-700
-                                rounded-xl shadow-2xl hidden overflow-hidden max-h-72 overflow-y-auto">
+                                rounded-sm shadow-2xl hidden overflow-hidden max-h-72 overflow-y-auto">
                     </div>
                 </div>
 
@@ -151,12 +151,12 @@
             <div class="flex items-center justify-between gap-4">
                 <a href="{{ route('collections.index') }}"
                    class="px-6 py-3 border border-slate-700 text-slate-400 hover:text-white
-                          hover:border-slate-500 text-sm font-medium rounded-xl transition">
+                          hover:border-slate-500 text-sm font-medium rounded-sm transition">
                     Batal
                 </a>
                 <button type="submit"
                         class="flex items-center gap-2 px-8 py-3 bg-purple-600 hover:bg-purple-500
-                               text-white text-sm font-bold rounded-xl transition
+                               text-white text-sm font-bold rounded-sm transition
                                shadow-lg shadow-purple-900/40 disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
@@ -260,7 +260,7 @@ function renderSelected() {
     emptyBooksEl.classList.toggle('hidden', selectedBooks.length > 0);
 
     selectedBooksEl.innerHTML = selectedBooks.map(b => `
-        <div class="flex items-center gap-3 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3">
+        <div class="flex items-center gap-3 bg-slate-900 border border-slate-700 rounded-sm px-4 py-3">
             ${b.cover
                 ? `<img src="${b.cover}" class="w-8 h-11 object-cover rounded shrink-0">`
                 : `<div class="w-8 h-11 bg-slate-700 rounded shrink-0"></div>`

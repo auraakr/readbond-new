@@ -4,7 +4,7 @@
 <div class="bg-slate-900 min-h-screen pt-24 pb-16 px-6 lg:px-16">
 
     {{-- ─── PAGE HEADER ─── --}}
-    <div class="max-w-6xl mx-auto mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+    <div class="max-w-5xl mx-auto mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
             <p class="text-slate-500 text-xs uppercase tracking-widest font-medium mb-1">Readbond</p>
             <h1 class="text-3xl font-black text-white tracking-tight">Collections</h1>
@@ -42,7 +42,7 @@
     </div>
 
     {{-- ─── FEATURED COLLECTIONS ─── --}}
-    <div class="max-w-6xl mx-auto mb-14">
+    <div class="max-w-5xl mx-auto mb-14">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <p class="text-slate-500 text-[11px] uppercase tracking-widest">Pilihan Editor</p>
@@ -118,7 +118,7 @@
     </div>
 
     {{-- ─── POPULAR COLLECTIONS ─── --}}
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-5xl mx-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <p class="text-slate-500 text-[11px] uppercase tracking-widest">Terpopuler</p>

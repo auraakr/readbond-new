@@ -28,7 +28,6 @@ Route::get('/books/{external_id}', [BooksController::class, 'show'])->name('book
 
 // Public Collection Views
 Route::get('/collections', [CollectionController::class, 'index'])->name('collections.index');
-Route::get('/collections/{id}', [CollectionController::class, 'show'])->name('collections.show');
 
 // Authentication (Khusus Guest)
 Route::middleware('guest')->group(function () {
@@ -65,11 +64,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{id}', [ReadingLogController::class, 'destroy'])->name('destroy');
     });
 
-    // Book Reviews Interactions
-    Route::post('/reviews/{review}/like', [BooksController::class, 'toggleLikeReview'])->name('reviews.like');
-
     // Protected Collection Management
     Route::prefix('collections')->name('collections.')->group(function () {
+        Route::get('/',                           [CollectionController::class, 'index'])->name('index');
         Route::get('/create',                     [CollectionController::class, 'create'])->name('create');
         Route::post('/',                          [CollectionController::class, 'store'])->name('store');
         Route::delete('/{id}',                    [CollectionController::class, 'destroy'])->name('destroy');
@@ -105,27 +102,33 @@ Route::middleware('auth')->group(function () {
     });
 
     // Book Club Features
-    Route::middleware(['auth'])->group(function () {
+    Route::prefix('clubs')->name('clubs.')->group(function () {
         // Navigasi Index & Show
-        Route::get('/clubs', [BookClubController::class, 'index'])->name('clubs.index');
-        Route::get('/clubs/create', [BookClubController::class, 'create'])->name('clubs.create');
-        Route::post('/clubs', [BookClubController::class, 'store'])->name('clubs.store');
-        Route::get('/clubs/{slug}', [BookClubController::class, 'show'])->name('clubs.show');
+        Route::get('/', [BookClubController::class, 'index'])->name('index');
+        Route::get('/create', [BookClubController::class, 'create'])->name('create');
+        Route::post('/', [BookClubController::class, 'store'])->name('store');
+        Route::get('/{slug}', [BookClubController::class, 'show'])->name('show');
         
-        // Manajemen Dashboard Setting (Moderator Only)
-        Route::get('/clubs/{slug}/edit', [BookClubController::class, 'edit'])->name('clubs.edit');
-        Route::put('/clubs/{id}', [BookClubController::class, 'update'])->name('clubs.update');
-        Route::post('/clubs/{id}/add-moderator', [BookClubController::class, 'addModerator'])->name('clubs.add-moderator');
+        /// Manajemen Dashboard Setting (Moderator Only)
+        Route::get('/{slug}/edit', [BookClubController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [BookClubController::class, 'update'])->name('update');
+        Route::post('/{id}/add-moderator', [BookClubController::class, 'addModerator'])->name('add-moderator');
 
         // Toggle Join/Leave via AJAX Button
-        Route::post('/clubs/{id}/toggle-join', [BookClubController::class, 'toggleJoin'])->name('clubs.toggle-join');
+        Route::post('/{id}/toggle-join', [BookClubController::class, 'toggleJoin'])->name('toggle-join');
 
     });
     /**
      * CATCH-ALL ROUTE (WAJIB PALING BAWAH)
      * Ditempatkan di dasar scope 'auth' agar username dinamis tidak menabrak url statis seperti /diary atau /collections
      */
+    Route::get('/collections/{id}', [CollectionController::class, 'show'])->name('collections.show');
+    
     Route::get('/{user:username}', [ProfileController::class, 'show'])->name('profile');
+    
+    // Book Reviews Interactions
+    Route::post('/reviews/{review}/like', [BooksController::class, 'toggleLikeReview'])->name('reviews.like');
+
 });
 
 
