@@ -11,6 +11,7 @@ use App\Http\Controllers\ReadingLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DiaryLogController;
 use App\Http\Controllers\Admin\BookController as AdminBookController;
+use App\Http\Controllers\BookClubController;
 
 /*
 |--------------------------------------------------------------------------
@@ -103,6 +104,23 @@ Route::middleware('auth')->group(function () {
         Route::get('/collections', [ProfileController::class, 'collections'])->name('collections');
     });
 
+    // Book Club Features
+    Route::middleware(['auth'])->group(function () {
+        // Navigasi Index & Show
+        Route::get('/clubs', [BookClubController::class, 'index'])->name('clubs.index');
+        Route::get('/clubs/create', [BookClubController::class, 'create'])->name('clubs.create');
+        Route::post('/clubs', [BookClubController::class, 'store'])->name('clubs.store');
+        Route::get('/clubs/{slug}', [BookClubController::class, 'show'])->name('clubs.show');
+        
+        // Manajemen Dashboard Setting (Moderator Only)
+        Route::get('/clubs/{slug}/edit', [BookClubController::class, 'edit'])->name('clubs.edit');
+        Route::put('/clubs/{id}', [BookClubController::class, 'update'])->name('clubs.update');
+        Route::post('/clubs/{id}/add-moderator', [BookClubController::class, 'addModerator'])->name('clubs.add-moderator');
+
+        // Toggle Join/Leave via AJAX Button
+        Route::post('/clubs/{id}/toggle-join', [BookClubController::class, 'toggleJoin'])->name('clubs.toggle-join');
+
+    });
     /**
      * CATCH-ALL ROUTE (WAJIB PALING BAWAH)
      * Ditempatkan di dasar scope 'auth' agar username dinamis tidak menabrak url statis seperti /diary atau /collections

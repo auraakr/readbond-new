@@ -16,8 +16,8 @@
                 <x-nav-link href="/books" :active="request()->is('books*')">Books</x-nav-link>
                 <x-nav-link href="/collections" :active="request()->is('collection*')">Collection</x-nav-link>
                 <x-nav-link href="/friends" :active="request()->is('friends*')">Friends</x-nav-link>
-                <x-nav-link href="/#" :active="request()->is('#')">Clubs</x-nav-link>
-                
+                <x-nav-link href="/clubs" :active="request()->is('clubs*')">Clubs</x-nav-link>
+
                 @auth
                     @if(auth()->user()->role === 'admin')
                         <x-nav-link href="/admin/dashboard" :active="request()->is('admin*')">Dashboard</x-nav-link>
