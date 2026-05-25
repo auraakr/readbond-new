@@ -32,7 +32,7 @@
                             <div>
                                 <span class="font-bold text-slate-200">{{ $post->user->username }}</span>
                                 @if($post->user_id === $club->moderator_id)
-                                    <span class="text-[9px] bg-purple-950 text-purple-400 border border-purple-900/50 px-1.5 py-0.2 rounded-sm ml-1 uppercase font-black">Staff</span>
+                                    <span class="text-[9px] bg-purple-950 text-purple-400 border border-purple-900/50 px-1.5 py-0.2 rounded-sm ml-1 uppercase font-black">Moderator</span>
                                 @endif
                             </div>
                         </div>

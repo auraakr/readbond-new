@@ -6,7 +6,7 @@
         
         {{-- ─── NAVIGATION & NAVIGATION DROPDOWN ─── --}}
         <div class="mb-8 flex justify-between items-center border-b border-slate-800 pb-4">
-            <a href="{{ route('clubs.index') }}" class="text-slate-400 hover:text-white transition flex items-center gap-2 text-sm">
+            <a href="{{ route('clubs.index') }}" class="font-semibold uppercase tracking-wider text-slate-500 hover:text-white transition flex items-center gap-2 text-sm">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                 </svg>
@@ -130,7 +130,7 @@
                             <div class="text-xs text-slate-300 flex-1 flex flex-col justify-between">
                                 <div>
                                     <h4 class="font-bold text-white text-sm line-clamp-1">{{ $book->title }}</h4>
-                                    <p class="text-slate-500 mt-0.5">by {{ $book->author ?? 'Unknown Author' }}</p>
+                                    <p class="text-slate-500 mt-0.5">by {{ $book->author_name ?? 'Unknown Author' }}</p>
                                 </div>
 
                                 <div class="flex justify-between items-center mt-3 pt-2 border-t border-slate-800/60">
@@ -162,7 +162,7 @@
                 <div onclick="closeModal()" class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
                 
                 {{-- Kotak Dialog --}}
-                <div class="bg-slate-850 border border-slate-800 w-full max-w-md rounded-sm p-6 relative z-10 shadow-xl">
+                <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-sm p-6 relative z-10 shadow-xl">
                     <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-800">
                         <h4 class="text-sm font-bold text-white uppercase tracking-wider">Add Group Reading</h4>
                         <button onclick="closeModal()" class="text-slate-500 hover:text-slate-300 text-sm">&times;</button>
@@ -198,36 +198,54 @@
 
         {{-- ─── SECTION: DISCUSSIONS BOARD ─── --}}
         <div class="border-t border-slate-800 pt-6">
-            <div class="flex justify-between items-center py-6">
+            <div class="flex justify-between items-center py-4">
                 <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider">Discussions Board</h3>
-                @if($isMember || $isModerator)
+                
+                {{-- Logika filter tombol New Topic berdasarkan izin internal club --}}
+                @php
+                    $isModerator = Auth::check() && $club->members()->where('user_id', Auth::id())->where('book_club_members.role', 'moderator')->exists();
+                    $canCreateDiscussion = $isModerator || ($isMember && $club->allow_member_add_discussion);
+                @endphp
+
+                @if($canCreateDiscussion)
                     <a href="{{ route('clubs.discussion.create', $club->slug) }}" class="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 text-xs font-bold transition">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
-                        New Thread
-                    </a >
+                        New Topic
+                    </a>
                 @endif
             </div>
 
             {{-- List Obrolan Diskusi --}}
             <div class="divide-y divide-slate-800 border-t border-b border-slate-800">
-                @forelse($discussions as $discussion)
+                {{-- Pastikan variabel $club->discussions di-loop dengan benar --}}
+                @forelse($club->discussions as $discussion)
                     <div class="py-3.5 flex justify-between items-center group">
                         <div class="min-w-0 pr-4">
                             <a href="{{ route('clubs.discussion.show', ['slug' => $club->slug, 'discussion' => $discussion->id]) }}" class="block text-sm font-semibold text-white group-hover:text-purple-300 transition truncate">
                                 {{ $discussion->title }}
                             </a>
-                            <span class="text-[10px] text-slate-500 block mt-0.5">Dimulai oleh {{ $discussion->user->username ?? 'Anggota' }}</span>
+                            
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="text-[10px] text-slate-500">Dimulai oleh <span class="text-slate-400">{{ $discussion->user->username ?? 'Anggota' }}</span></span>
+                                
+                                {{-- Badge Informasi Tambahan jika Diskusi ini nge-mention buku tertentu --}}
+                                @if($discussion->book_id && $discussion->book)
+                                    <span class="text-[9px] bg-slate-800 text-slate-400 border border-slate-700/60 px-1.5 py-0.2 rounded-sm truncate max-w-[150px]">
+                                        📖 {{ $discussion->book->title }}
+                                    </span>
+                                @endif
+                            </div>
                         </div>
                         <div class="shrink-0 text-right">
                             <span class="text-xs font-bold bg-slate-800 text-slate-400 px-2.5 py-1 rounded-sm border border-slate-700/50">
-                                {{ $discussion->posts_count ?? 0 }} posts
+                                {{ $discussion->posts_count ?? $discussion->posts->count() }} posts
                             </span>
                         </div>
                     </div>
                 @empty
-                    <p class="text-xs text-slate-500 italic py-4 text-center">Belum ada topik diskusi dimulai. Jadilah yang pertama berkomentar!</p>
+                    <p class="text-xs text-slate-500 italic py-6 text-center">Belum ada topik diskusi dimulai. Jadilah yang pertama berkomentar!</p>
                 @endforelse
             </div>
         </div>
