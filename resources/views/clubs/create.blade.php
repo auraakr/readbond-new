@@ -13,14 +13,25 @@
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+                
+                {{-- FIELD CLUB COVER WITH LIVE PREVIEW --}}
                 <div class="col-span-1">
                     <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Club Cover</label>
-                    <div class="aspect-[3/4] bg-slate-800 border-2 border-dashed border-slate-700 rounded-sm flex flex-col items-center justify-center p-4 text-center relative group hover:border-purple-500 transition">
-                        <svg class="w-8 h-8 text-slate-500 group-hover:text-purple-400 mb-2 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                        </svg>
-                        <span class="text-xs text-slate-400 group-hover:text-purple-300 transition block">Pilih File Cover</span>
-                        <input type="file" name="cover_image" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                    <div class="aspect-[3/4] bg-slate-800 border-2 border-dashed border-slate-700 rounded-sm flex flex-col items-center justify-center p-4 text-center relative group hover:border-purple-500 transition overflow-hidden">
+                        
+                        {{-- Elemen Preview Image (Akan diisi & dimunculkan lewat JS) --}}
+                        <img id="cover-preview" class="absolute inset-0 w-full h-full object-cover hidden z-10 pointer-events-none">
+
+                        {{-- Placeholder Default (Akan disembunyikan jika gambar diupload) --}}
+                        <div id="placeholder-content" class="flex flex-col items-center justify-center">
+                            <svg class="w-8 h-8 text-slate-500 group-hover:text-purple-400 mb-2 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="text-xs text-slate-400 group-hover:text-purple-300 transition block">Pilih File Cover</span>
+                        </div>
+
+                        {{-- Input File --}}
+                        <input type="file" name="cover_image" id="cover-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
                     </div>
                 </div>
 
@@ -95,4 +106,28 @@
 
     </div>
 </div>
+
+{{-- SCRIPT UNTUK MENANGANI PREVIEW GAMBAR --}}
+<script>
+    document.getElementById('cover-input').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const previewImg = document.getElementById('cover-preview');
+                const placeholderContent = document.getElementById('placeholder-content');
+                
+                // Set src gambar dengan hasil pembacaan file
+                previewImg.src = e.target.result;
+                // Tampilkan gambar preview
+                previewImg.classList.remove('hidden');
+                // Sembunyikan icon dan text bawaan
+                placeholderContent.classList.add('hidden');
+            }
+            
+            reader.readAsDataURL(file);
+        }
+    });
+</script>
 @endsection
