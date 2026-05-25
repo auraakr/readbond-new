@@ -42,7 +42,7 @@
         </form>
     </div>
 
-    {{-- ─── FEATURED CLUBS (Rekomendasi Utama dengan tumpukan Cover Bersama) ─── --}}
+    {{-- ─── FEATURED CLUBS ─── --}}
     <div class="max-w-5xl mx-auto mb-14">
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -51,62 +51,87 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 lg:grid-cols-1 gap-8">
-            {{-- Mengambil 3 Club teratas yang memiliki member banyak/aktif --}}
-            @forelse($clubs->take(3) as $club)
-            <div class="border-b border-slate-700/60 {{ $loop->last ? '' : 'pb-6' }} py-2 hover:border-slate-600 transition group">
-                <div class="flex flex-col lg:flex-row lg:items-start gap-3">
-
-                    {{-- Mini Book Stack / Avatar Identitas Klub --}}
-                    <div class="flex shrink-0 relative">
-                        <div class="lg:w-24 aspect-[3/4] rounded-sm overflow-hidden bg-gradient-to-br from-purple-900 to-slate-800 border border-slate-700 shadow-md flex flex-col items-center justify-center p-2 text-center relative group-hover:border-purple-500 transition">
-                            <span class="text-[10px] uppercase font-bold tracking-wider text-purple-400 mb-1">Club</span>
-                            <span class="text-white font-black text-xs line-clamp-3 px-1 leading-tight">{{ $club->name }}</span>
+        <div class="grid grid-cols-2 lg:flex lg:flex-wrap justify-center gap-6 mx-auto">
+            {{-- Batasi hanya mengambil maksimal 4 Club teratas --}}
+            @forelse($clubs->take(4) as $club)
+            <div class="bg-slate-900/40 text-center lg:w-60 hover:border-slate-700 hover:bg-slate-900 transition group flex flex-col justify-between h-full shadow-lg">
+                
+                <div>
+                    {{-- Bagian Atas: Cover & Badge Kategori --}}
+                    <div class="flex items-start justify-between gap-3 mb-4">
+                        {{-- Mini Book Cover Club (Rasio 3:4) --}}
+                        <div class="w-40 aspect-[3/4] rounded-sm overflow-hidden bg-gradient-to-br from-purple-900 to-slate-800 border border-slate-700 shadow-md mx-auto flex flex-col items-center justify-center p-1.5 text-center relative shrink-0 group-hover:border-purple-500 transition">
+                            <span class="text-[8px] uppercase font-bold tracking-wider text-purple-400 mb-0.5">Club</span>
+                            <span class="text-white font-black text-[10px] line-clamp-3 px-0.5 leading-tight">{{ $club->name }}</span>
                             
-                            {{-- Dekorasi silang samar estetik jika cover image kosongan --}}
                             @if($club->cover_image)
                                 <img src="{{ asset('storage/' . $club->cover_image) }}" class="absolute inset-0 w-full h-full object-cover rounded-sm z-10">
                             @else
                                 <svg class="absolute inset-0 w-full h-full text-slate-700/20 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100" fill="none" stroke="currentColor">
-                                    <line x1="0" y1="0" x2="100" y2="100" stroke-width="1"/>
-                                    <line x1="100" y1="0" x2="0" y2="100" stroke-width="1"/>
+                                    <line x1="0" y1="0" x2="100" y2="100" stroke-width="0.75"/>
+                                    <line x1="100" y1="0" x2="0" y2="100" stroke-width="0.75"/>
                                 </svg>
                             @endif
                         </div>
                     </div>
 
-                    {{-- Informasi Meta & Deskripsi Club --}}
-                    <div class="flex-1 min-w-0 lg:pl-4">
-                        <div class="flex items-start justify-between gap-3">
-                            <div>
-                                <span class="bg-purple-950/60 border border-purple-800 text-purple-400 text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wide">
-                                    #{{ $club->category }}
-                                </span>
-                                <h3 class="text-white font-bold text-lg leading-tight mt-2 group-hover:text-purple-300 transition">
-                                    {{ $club->name }}
-                                </h3>
-                                <p class="text-slate-500 text-sm mt-1">
-                                    Moderator <span class="text-slate-400">{{ $club->moderator->name ?? 'Admin' }}</span>
-                                    · <span class="font-semibold text-slate-300">{{ number_format($club->members_count, 0, ',', '.') }}</span> Anggota
-                                </p>
-                                <p class="text-slate-400 text-sm mt-2 max-w-3xl line-clamp-2 leading-relaxed">
-                                    {{ $club->description }}
-                                </p>
-                            </div>
-                        </div>
-
-                        <a href="{{ route('clubs.show', $club->slug) }}"
-                           class="inline-flex items-center gap-1.5 mt-4 text-purple-400 hover:text-purple-300 text-sm font-medium transition group/link">
-                            Lihat aktivitas baca & room diskusi
-                            <svg class="w-4 h-4 transition-transform group-hover/link:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                            </svg>
-                        </a>
+                    {{-- Bagian Tengah: Nama & Deskripsi Club --}}
+                    <div class="space-y-1.5">
+                        <h3 class="text-white font-bold text-base leading-tight group-hover:text-purple-300 transition line-clamp-1">
+                            {{ $club->name }}
+                        </h3>
+                        <p class="text-slate-500 text-[11px]">
+                            Hosted by <span class="text-slate-400">{{ $club->moderator->name ?? 'Admin' }}</span>
+                        </p>
+                        <p class="text-slate-400 text-xs line-clamp-1 leading-relaxed pt-1">
+                            {{ $club->description }}
+                        </p>
                     </div>
                 </div>
+
+                {{-- Bagian Bawah: Avatar Members Stack & Tombol Navigasi --}}
+                <div class="mt-5 pt-4 border-t border-slate-800/60 space-y-4">
+                    {{-- Avatar Tumpuk Sesuai Gambar --}}
+                    <div class="flex items-center justify-center gap-2.5">
+                        <div class="flex -space-x-2 overflow-hidden">
+                            @foreach($club->members->take(3) as $member)
+                                @if($member->profile_photo_path)
+                                    <img class="inline-block h-6 w-6 rounded-full ring-2 ring-[#0a0a0f] object-cover" 
+                                        src="{{ asset('storage/' . $member->profile_photo_path) }}" 
+                                        alt="{{ $member->name }}">
+                                @else
+                                    <div class="inline-block h-6 w-6 rounded-full ring-2 ring-[#0a0a0f] bg-purple-600 flex items-center justify-center text-[9px] font-bold text-white uppercase">
+                                        {{ substr($member->name, 0, 1) }}
+                                    </div>
+                                @endif
+                            @endforeach
+
+                            {{-- Hitung sisa member --}}
+                            @if($club->members_count > 3)
+                                <div class="inline-flex h-6 min-w-[24px] px-1 items-center justify-center rounded-full ring-2 ring-[#0a0a0f] bg-slate-800 text-[9px] font-medium text-slate-300">
+                                    +{{ $club->members_count - 3 }}
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <span class="text-slate-500 text-[11px] font-medium">
+                            <span class="text-slate-300 font-bold">{{ number_format($club->members_count, 0, ',', '.') }}</span> readers
+                        </span>
+                    </div>
+
+                    {{-- Action Button masuk ke ruang Club --}}
+                    <a href="{{ route('clubs.show', $club->slug) }}"
+                    class="w-full inline-flex items-center justify-center gap-1.5 bg-slate-800 hover:bg-purple-600 text-slate-300 hover:text-white py-2 px-3 rounded-sm text-xs font-bold uppercase tracking-wider transition duration-200 group/link">
+                        Enter Space
+                        <svg class="w-3.5 h-3.5 transition-transform group-hover/link:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+
             </div>
             @empty
-                <p class="text-slate-500 text-center py-8">Belum ada book club rekomendasi tersedia.</p>
+                <p class="text-slate-500 text-center py-8 col-span-3">Belum ada book club rekomendasi tersedia.</p>
             @endforelse
         </div>
     </div>
