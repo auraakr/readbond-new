@@ -264,13 +264,22 @@ class BookClubController extends Controller
     {
         $club = BookClub::where('slug', $clubSlug)->firstOrFail();
         
+        // 1. Ambil data diskusi aktif saat ini beserta relasi isinya
         $discussion = BookClubDiscussion::with(['user', 'posts.user'])
             ->where('book_club_id', $club->id)
             ->findOrFail($discussionId);
 
-        $isMember = $club->members()->where('user_id', Auth::id())->exists();
+        // 2. Ambil 5 daftar topik diskusi lainnya di klub yang sama untuk dipasang di sidebar
+        $otherDiscussions = BookClubDiscussion::with('user')
+            ->withCount('posts')
+            ->where('book_club_id', $club->id)
+            ->orderBy('updated_at', 'desc')
+            ->take(5) // Ambil 5 topik teratas/terbaru saja
+            ->get();
 
-        return view('clubs.discussion.show', compact('club', 'discussion', 'isMember'));
+        $isMember = Auth::check() ? $club->members()->where('user_id', Auth::id())->exists() : false;
+
+        return view('clubs.discussion.show', compact('club', 'discussion', 'otherDiscussions', 'isMember'));
     }
 
     // 4. STORE POST / REPLY (Ubah dari ID ke Slug)
