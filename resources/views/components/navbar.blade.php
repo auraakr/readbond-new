@@ -95,7 +95,7 @@
             <x-responsive-nav-link href="/" :active="request()->is('/')">Home</x-responsive-nav-link>
             <x-responsive-nav-link href="/books" :active="request()->is('books*')">Books</x-responsive-nav-link>
             <x-responsive-nav-link href="/collections" :active="request()->is('collection*')">Collection</x-responsive-nav-link>
-            <x-responsive-nav-link href="/#" :active="request()->is('#')">Clubs</x-responsive-nav-link>
+            <x-responsive-nav-link href="/clubs" :active="request()->is('clubs*')">Clubs</x-responsive-nav-link>
             @auth
                 <x-responsive-nav-link href="{{ route('profile', ['user' => auth()->user()->username]) }}" :active="request()->is('profile*')">My Profile</x-responsive-nav-link>
                 @if(auth()->user()->role === 'admin')

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Book;
+use App\Models\BookClub;
 use App\Models\BookRating;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -337,5 +338,18 @@ class ProfileController extends Controller
             'user' => $user,
             'collections' => $collections,
         ]);
+    }
+
+    public function clubs($username)
+    {
+        $user = User::where('username', $username)->firstOrFail();
+
+        // Ambil semua club yang diikuti atau didirikan oleh user tersebut
+        $clubs = $user->clubs() // Asumsi nama relasi BelongsToMany ke BookClub di model User adalah clubs()
+                    ->withCount(['members', 'books'])
+                    ->orderBy('book_club_members.created_at', 'desc')
+                    ->get();
+
+        return view('user.profile-clubs', compact('user', 'clubs'));
     }
 }

@@ -99,6 +99,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reviews',     [ProfileController::class, 'reviews'])->name('reviews');
         Route::get('/readlist',    [ProfileController::class, 'readlist'])->name('readlist');
         Route::get('/collections', [ProfileController::class, 'collections'])->name('collections');
+        Route::get('/clubs',       [ProfileController::class, 'clubs'])->name('clubs');
     });
 
     // Book Club Features

@@ -97,4 +97,8 @@ class User extends Authenticatable
         return $this->attributes['reading_streak'] ?? 0;
     }
 
+    public function clubs()
+    {
+        return $this->belongsToMany(BookClub::class, 'book_club_members')->withTimestamps();
+    }
 }

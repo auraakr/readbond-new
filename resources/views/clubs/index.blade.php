@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <div class="space-y-8">
+        <div class="grid grid-cols-2 lg:grid-cols-1 gap-8">
             {{-- Mengambil 3 Club teratas yang memiliki member banyak/aktif --}}
             @forelse($clubs->take(3) as $club)
             <div class="border-b border-slate-700/60 {{ $loop->last ? '' : 'pb-6' }} py-2 hover:border-slate-600 transition group">
@@ -59,7 +59,7 @@
 
                     {{-- Mini Book Stack / Avatar Identitas Klub --}}
                     <div class="flex shrink-0 relative">
-                        <div class="w-20 lg:w-24 aspect-[3/4] rounded-sm overflow-hidden bg-gradient-to-br from-purple-900 to-slate-800 border border-slate-700 shadow-md flex flex-col items-center justify-center p-2 text-center relative group-hover:border-purple-500 transition">
+                        <div class="lg:w-24 aspect-[3/4] rounded-sm overflow-hidden bg-gradient-to-br from-purple-900 to-slate-800 border border-slate-700 shadow-md flex flex-col items-center justify-center p-2 text-center relative group-hover:border-purple-500 transition">
                             <span class="text-[10px] uppercase font-bold tracking-wider text-purple-400 mb-1">Club</span>
                             <span class="text-white font-black text-xs line-clamp-3 px-1 leading-tight">{{ $club->name }}</span>
                             
