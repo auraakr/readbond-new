@@ -19,8 +19,18 @@ class ProfileController extends Controller
         $user = User::where('username', $username)
             ->withCount(['readingLogs as books_count'])
             ->withCount(['readingLists as readlist_count'])
+            ->withCount(['following as following_count'])
             ->firstOrFail();
 
+        $user->avatar_url = !empty($user->avatar)
+            ? (filter_var($user->avatar, FILTER_VALIDATE_URL) ? $user->avatar : asset('storage/' . $user->avatar))
+            : null;
+
+        // ── CEK STATUS FOLLOW (Apakah kita mem-follow user ini) ──
+        $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+            
         // 2. Ambil semua aktivitas dan gabungkan
         $recentActivity = $this->getRecentActivity($user);
 
@@ -58,6 +68,7 @@ class ProfileController extends Controller
 
         return view('user.profile', [
             'user' => $user,
+            'isFollowed' => $isFollowed,
             'recentActivity' => $recentActivity,
             'recentReviews' => $recentReviews,
             'readlist' => $readlist,

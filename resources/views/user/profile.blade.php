@@ -108,8 +108,14 @@
                         <div class="flex gap-2 flex-wrap">
                             @foreach($user->following ?? [] as $follow)
                             <a href="#" title="{{ $follow->name }}">
-                                <img src="{{ $follow->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($follow->name).'&background=1e1e2e&color=8b5cf6&size=40' }}"
-                                    class="w-10 h-10 rounded-full object-cover ring-1 ring-white/10 hover:ring-purple-500/50 transition" alt="{{ $follow->name }}">
+                                @if($follow->avatar_url)
+                                    <img src="{{ $follow->avatar_url }}" alt="{{ $follow->name }}" 
+                                        class="w-8 h-8 rounded-full object-cover border border-purple-100/50">
+                                @else
+                                    <div class="w-8 h-8 rounded-full bg-purple-600/20 text-purple-400 flex items-center justify-center text-sm font-bold uppercase">
+                                        {{ substr($follow->name, 0, 2) }}
+                                    </div>
+                                @endif
                             </a>
                             @endforeach
                         </div>
