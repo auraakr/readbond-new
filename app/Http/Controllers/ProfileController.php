@@ -18,6 +18,7 @@ class ProfileController extends Controller
         // 1. Ambil data user beserta count relasinya
         $user = User::where('username', $username)
             ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLists as readlist_count'])
             ->firstOrFail();
 
         // 2. Ambil semua aktivitas dan gabungkan
@@ -321,11 +322,43 @@ class ProfileController extends Controller
                 ];
             });
 
+        $clubs = $user->clubs() 
+            ->latest()
+            ->get()
+            ->map(function ($club) {
+                return [
+                    'type' => 'club_join',
+                    'book' => null,
+                    'club' => $club,
+                    'rating' => null,
+                    'notes' => null,
+                    'created_at' => $club->pivot ? $club->pivot->created_at : $club->created_at,
+                    'data' => $club,
+                ];
+            });
+
+        $diaries = $user->diaryLogs()
+            ->with('book')
+            ->latest()
+            ->get()
+            ->map(function ($diary) {
+                return [
+                    'type' => 'diary',
+                    'book' => $diary->book,
+                    'rating' => null,
+                    'notes' => $diary->content,
+                    'created_at' => $diary->updated_at,
+                    'data' => $diary,
+                ];
+            });
+
         return $activities
             ->concat($readingLogs)
             ->concat($likes)
             ->concat($ratings)
             ->concat($reviews)
+            ->concat($clubs)  
+            ->concat($diaries)
             ->sortByDesc('created_at')
             ->values();
     }

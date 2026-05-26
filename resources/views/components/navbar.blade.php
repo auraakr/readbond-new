@@ -34,16 +34,28 @@
                         </button>
 
                         <div class="relative">
-                            <button @click="profileOpen = !profileOpen" @click.away="profileOpen = false" class="p-2 rounded-full text-slate-300 hover:text-white transition bg-slate-800 border border-white/5">
-                                <x-heroicon-o-user class="h-5 w-5" />
+                            <button @click="profileOpen = !profileOpen" @click.away="profileOpen = false" 
+                                    class="flex items-center justify-center p-0.5 rounded-full text-slate-300 hover:text-white transition bg-slate-800 border border-white/5 overflow-hidden w-9 h-9">
+                                
+                                {{-- ── FOTO AVATAR / INISIAL ── --}}
+                                @if(auth()->user()->avatar && !empty(auth()->user()->avatar))
+                                    <img src="{{ filter_var(auth()->user()->avatar, FILTER_VALIDATE_URL) ? auth()->user()->avatar : asset('storage/' . auth()->user()->avatar) }}" 
+                                        alt="{{ auth()->user()->name }}" 
+                                        class="w-full h-full rounded-full object-cover">
+                                @else
+                                    <div class="w-full h-full rounded-full bg-purple-600/20 text-purple-400 flex items-center justify-center text-xs font-bold uppercase">
+                                        {{ substr(auth()->user()->name ?? auth()->user()->username, 0, 2) }}
+                                    </div>
+                                @endif
+
                             </button>
 
                             <div x-show="profileOpen" 
-                                 x-cloak
-                                 x-transition:enter="transition ease-out duration-100"
-                                 x-transition:enter-start="opacity-0 scale-95"
-                                 x-transition:enter-end="opacity-100 scale-100"
-                                 class="absolute right-0 mt-3 w-48 bg-slate-800 border border-white/10 rounded-xl shadow-2xl py-2 z-50">
+                                x-cloak
+                                x-transition:enter="transition ease-out duration-100"
+                                x-transition:enter-start="opacity-0 scale-95"
+                                x-transition:enter-end="opacity-100 scale-100"
+                                class="absolute right-0 mt-3 w-48 bg-slate-800 border border-white/10 rounded-xl shadow-2xl py-2 z-50">
                                 
                                 <div class="px-4 py-2 border-b border-white/5">
                                     <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Username</p>

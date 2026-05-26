@@ -126,7 +126,7 @@
                 <div class="border border-white/5 rounded-sm overflow-hidden bg-slate-900">
                     <div class="flex items-center justify-between px-4 py-3 border-b border-white/5">
                         <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Readlist</p>
-                        <span class="text-[10px] text-slate-600">{{ count($user->readlist ?? []) }}</span>
+                        <span class="text-[10px] text-slate-600">{{ $user->readlist_count ?? 0 }}</span>
                     </div>
                     <div class="grid grid-cols-4">
                         @forelse($readlist as $item)

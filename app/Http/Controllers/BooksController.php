@@ -256,24 +256,36 @@ class BooksController extends Controller
         $reviews = $book->reviews()
             ->with('user')
             ->where('rating', '>', 0)
-            ->withCount('likes') // Menghitung otomatis kolom 'likes_count'
+            ->withCount('likes')
             ->withExists(['likes' => function ($query) use ($currentUserId) {
-                $query->where('user_id', $currentUserId); // Mengecek kolom 'likes_exists' (true/false)
+                $query->where('user_id', $currentUserId);
             }])
             ->latest()
             ->get()
             ->map(function ($review) {
+                // Cek apakah user punya avatar dan bukan string kosong
+                $avatar = $review->user->avatar;
+                
+                // Tentukan URL avatar yang valid
+                $avatarUrl = null;
+                if (!empty($avatar)) {
+                    // Jika path-nya sudah berupa URL penuh (misal dari google oauth / internet)
+                    if (filter_var($avatar, FILTER_VALIDATE_URL)) {
+                        $avatarUrl = $avatar;
+                    } else {
+                        // Jika hanya nama file, arahkan ke folder asset storage kamu
+                        $avatarUrl = asset('storage/' . $avatar); 
+                    }
+                }
+
                 return [
                     'id' => $review->id,
                     'user_name' => $review->user->name,
-                    'user_avatar' => $review->user->avatar,
+                    'user_avatar' => $avatarUrl, // Sekarang nilainya bisa URL valid atau null
                     'rating' => $review->rating,
                     'review' => $review->review,
-                    
-                    // Masukkan hasil kueri ke dalam array pembungkus
-                    'is_liked' => $review->likes_exists, // Bernilai true jika user login sudah nge-like
-                    'likes_count' => $review->likes_count, // Bernilai angka riil jumlah like dari DB
-                    
+                    'is_liked' => $review->likes_exists,
+                    'likes_count' => $review->likes_count,
                     'created_at' => $review->created_at->diffForHumans(),
                 ];
             });
