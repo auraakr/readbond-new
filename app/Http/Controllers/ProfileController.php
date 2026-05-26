@@ -36,7 +36,7 @@ class ProfileController extends Controller
         $readlist = $user->readingLists()
             ->with('book')
             ->latest()
-            ->limit(8)
+            ->limit(4)
             ->get();
 
         // 5. Distribusi Rating (untuk grafik batang)
