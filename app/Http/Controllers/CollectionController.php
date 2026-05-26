@@ -51,6 +51,25 @@ class CollectionController extends Controller
             'comments.likes',
         ])->withCount(['books', 'comments', 'likes'])->findOrFail($id);
 
+        // ── 1. FORMAT URL AVATAR UNTUK CURATOR (PEMBUAT KOLEKSI) ──
+        if ($collection->curator) {
+            $curatorAvatar = $collection->curator->avatar;
+            $collection->curator->avatar_url = !empty($curatorAvatar)
+                ? (filter_var($curatorAvatar, FILTER_VALIDATE_URL) ? $curatorAvatar : asset('storage/' . $curatorAvatar))
+                : null;
+        }
+
+        // ── 2. FORMAT URL AVATAR UNTUK SETIAP PENULIS KOMENTAR ──
+        $collection->comments->transform(function ($comment) {
+            if ($comment->author) {
+                $authorAvatar = $comment->author->avatar;
+                $comment->author->avatar_url = !empty($authorAvatar)
+                    ? (filter_var($authorAvatar, FILTER_VALIDATE_URL) ? $authorAvatar : asset('storage/' . $authorAvatar))
+                    : null;
+            }
+            return $comment;
+        });
+        
         $isLiked = Auth::check() && $collection->isLikedBy(Auth::user());
 
         return view('collections.show', compact('collection', 'isLiked'));

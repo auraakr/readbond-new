@@ -62,14 +62,19 @@
                         {{ $collection->title }}
                     </h1>
 
-                    <div class="flex items-center gap-2 mt-3">
-                        <div class="w-6 h-6 rounded-full bg-purple-500/30 flex items-center justify-center
-                                    text-purple-300 text-xs font-bold">
-                            {{ strtoupper(substr($collection->curator->name ?? 'U', 0, 1)) }}
+                    <div class="flex items-center gap-3">
+                        @if($collection->curator->avatar_url)
+                            <img src="{{ $collection->curator->avatar_url }}" alt="{{ $collection->curator->name }}" 
+                                class="w-8 h-8 rounded-full object-cover border border-purple-100/50">
+                        @else
+                            <div class="w-8 h-8 rounded-full bg-purple-600/20 text-purple-400 flex items-center justify-center text-sm font-bold uppercase">
+                                {{ substr($collection->curator->name, 0, 2) }}
+                            </div>
+                        @endif
+                        <div>
+                            <p class="text-sm font-medium text-white">{{ $collection->curator->name }}</p>
+                            <p class="text-xs text-slate-500">Curator</p>
                         </div>
-                        <span class="text-slate-400 text-sm">
-                            by <span class="text-slate-200 font-medium">{{ $collection->curator->name ?? 'Unknown' }}</span>
-                        </span>
                     </div>
 
                     @if($collection->description)
@@ -339,10 +344,14 @@
                     <div class="bg-slate-800/60 border border-slate-700/60 rounded-sm p-4
                                 hover:border-slate-600 transition">
                         <div class="flex items-center gap-2.5 mb-2">
-                            <div class="w-7 h-7 rounded-full flex items-center justify-center
-                                        text-xs font-bold shrink-0 {{ $color }}">
-                                {{ strtoupper(substr($comment->author->name ?? 'U', 0, 1)) }}
-                            </div>
+                            @if($comment->author->avatar_url)
+                                <img src="{{ $comment->author->avatar_url }}" alt="{{ $comment->author->name }}" 
+                                    class="w-8 h-8 border border-purple-100/50 rounded-full object-cover">
+                            @else
+                                <div class="w-8 h-8 border border-purple-100/50 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 text-xs font-bold uppercase">
+                                    {{ substr($comment->author->name, 0, 1) }}
+                                </div>
+                            @endif
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between gap-2">
                                     <span class="text-white text-xs font-semibold truncate">
