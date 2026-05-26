@@ -101,4 +101,97 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(BookClub::class, 'book_club_members')->withTimestamps();
     }
+
+    public function followers()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'followers',      // nama tabel pivot
+            'following_id',   // foreign key untuk user yang difollow (saya)
+            'user_id'         // foreign key untuk user yang melakukan follow
+        )->withTimestamps();
+    }
+
+    /**
+     * Mengambil orang-orang yang diikuti oleh user ini (Following)
+     * Following = Orang yang saya follow
+     */
+    public function following()
+    {
+        return $this->belongsToMany(
+            User::class,
+            'followers',      // nama tabel pivot
+            'user_id',        // foreign key untuk user yang melakukan follow (saya)
+            'following_id'    // foreign key untuk user yang difollow
+        )->withTimestamps();
+    }
+
+    /**
+     * Helper untuk mengecek apakah user ini sudah memfollow user tertentu
+     */
+    public function isFollowing(User $user): bool
+    {
+        return $this->following()->where('following_id', $user->id)->exists();
+    }
+
+    /**
+     * Helper untuk mengecek apakah user ini difollow oleh user tertentu
+     */
+    public function isFollowedBy(User $user): bool
+    {
+        return $this->followers()->where('user_id', $user->id)->exists();
+    }
+
+    /**
+     * Follow a user
+     */
+    public function follow(User $user): bool
+    {
+        // Tidak bisa follow diri sendiri
+        if ($this->id === $user->id) {
+            return false;
+        }
+
+        // Jika sudah follow, return false
+        if ($this->isFollowing($user)) {
+            return false;
+        }
+
+        // Tambahkan ke tabel followers
+        $this->following()->attach($user->id);
+        return true;
+    }
+
+    /**
+     * Unfollow a user
+     */
+    public function unfollow(User $user): bool
+    {
+        // Jika belum follow, return false
+        if (!$this->isFollowing($user)) {
+            return false;
+        }
+
+        // Hapus dari tabel followers
+        $this->following()->detach($user->id);
+        return true;
+    }
+
+    /**
+     * Toggle follow/unfollow
+     */
+    public function toggleFollow(User $user): bool
+    {
+        if ($this->id === $user->id) {
+            return false; // Cannot follow yourself
+        }
+
+        if ($this->isFollowing($user)) {
+            $this->unfollow($user);
+            return false; // Now unfollowed
+        } else {
+            $this->follow($user);
+            return true; // Now following
+        }
+    }
 }
