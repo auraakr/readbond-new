@@ -216,12 +216,17 @@
                             {{-- Activity Content --}}
                             <div class="flex-1 min-w-0">
                                 <p class="text-sm text-white">
+                                    {{-- 1. PILIHAN TEKS BERDASARKAN TIPE --}}
                                     @if($activity['type'] === 'like')
                                         liked
                                     @elseif($activity['type'] === 'rating')
                                         rated
                                     @elseif($activity['type'] === 'review')
                                         reviewed
+                                    @elseif($activity['type'] === 'club_join')
+                                        joined
+                                    @elseif($activity['type'] === 'diary')
+                                        wrote a diary entry
                                     @elseif($activity['type'] === 'reading_log')
                                         @if($activity['status'] === 'want_to_read')
                                             wants to read
@@ -231,10 +236,19 @@
                                             finished
                                         @endif
                                     @endif
-                                    <a href="{{ route('books.show', $activity['book']->external_id) }}" 
-                                    class="font-semibold hover:text-purple-400 transition">
-                                        {{ $activity['book']->title }}
-                                    </a>
+
+                                    {{-- 2. LINK TARGET BERDASARKAN OBJEK YANG TERSEDIA --}}
+                                    @if(isset($activity['book']) && $activity['book'] !== null)
+                                        <a href="{{ route('books.show', $activity['book']->external_id) }}" 
+                                        class="font-semibold hover:text-purple-400 transition">
+                                            {{ $activity['book']->title }}
+                                        </a>
+                                    @elseif(isset($activity['club']) && $activity['club'] !== null)
+                                        <a href="{{ route('clubs.show', $activity['club']->slug) }}" 
+                                        class="font-semibold hover:text-purple-400 transition">
+                                            {{ $activity['club']->name }}
+                                        </a>
+                                    @endif
                                 </p>
                                 
                                 @if($activity['rating'])
@@ -254,15 +268,18 @@
                                 </p>
                             </div>
 
-                            {{-- Book Cover Thumbnail --}}
-                            <a href="{{ route('books.show', $activity['book']->external_id) }}" 
-                            class="flex-shrink-0 w-12 h-16 rounded overflow-hidden bg-slate-800 border border-white/10 group-hover:border-purple-500/50 transition">
-                                @if($activity['book']->cover_url)
-                                    <img src="{{ $activity['book']->cover_url }}" 
-                                        class="w-full h-full object-cover" 
-                                        alt="{{ $activity['book']->title }}">
-                                @endif
-                            </a>
+                            {{-- 3. AMANKAN THUMBNAIL (Hanya muncul jika aktivitas memiliki buku) --}}
+                            @if(isset($activity['book']) && $activity['book'] !== null)
+                                <a href="{{ route('books.show', $activity['book']->external_id) }}" 
+                                class="flex-shrink-0 w-12 h-16 rounded overflow-hidden bg-slate-800 border border-white/10 group-hover:border-purple-500/50 transition">
+                                    @if($activity['book']->cover_url)
+                                        <img src="{{ $activity['book']->cover_url }}" 
+                                            class="w-full h-full object-cover" 
+                                            alt="{{ $activity['book']->title }}">
+                                    @endif
+                                </a>
+                            @endif
+                            
                         </div>
                         @empty
                         <div class="text-center py-8 text-slate-500 text-sm">

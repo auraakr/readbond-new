@@ -182,14 +182,50 @@ class ProfileController extends Controller
                 ];
             });
 
-        // Gabungkan semua dan sort by created_at
+        // ─── 5. NEW: Club Activity (User Bergabung ke Book Club) ───
+        // Sesuaikan nama relasi 'clubs' jika di model User bernama 'bookClubs'
+        $clubs = $user->clubs() 
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($club) {
+                return [
+                    'type' => 'club_join',
+                    'book' => null,
+                    'club' => $club, // Mengirim data club untuk dirender namanya/linknya di view
+                    'rating' => null,
+                    'notes' => null,
+                    'created_at' => $club->pivot ? $club->pivot->created_at : $club->created_at,
+                    'data' => $club,
+                ];
+            });
+
+        // ─── 6. NEW: Diary Activity (User Menulis Catatan Harian) ───
+        $diaries = $user->diaryLogs()
+            ->latest()
+            ->limit(10)
+            ->get()
+            ->map(function ($diary) {
+                return [
+                    'type' => 'diary',
+                    'book' => null,
+                    'rating' => null,
+                    'notes' => $diary->content ?? $diary->notes, // Sesuaikan nama kolom isi diary-mu
+                    'created_at' => $diary->created_at,
+                    'data' => $diary,
+                ];
+            });
+
+        // Gabungkan semua dan sort by created_at secara Descending
         return $activities
             ->concat($readingLogs)
             ->concat($likes)
             ->concat($ratings)
             ->concat($reviews)
+            ->concat($clubs)  
+            ->concat($diaries) 
             ->sortByDesc('created_at')
-            ->take(5) // Ambil 12 aktivitas terbaru
+            ->take(5) 
             ->values();
     }
 
