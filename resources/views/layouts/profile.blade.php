@@ -21,8 +21,8 @@
 
                         {{-- Avatar --}}
                         <div class="relative flex-shrink-0">
-                            <img src="{{ $user->avatar_url ?? 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=8b5cf6&color=fff&size=96' }}"
-                                class="w-24 h-24 rounded-full object-cover ring-2 ring-white/10" alt="{{ $user->name }}">
+                            <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=8b5cf6&color=fff&size=96' }}"
+                                    class="w-24 h-24 rounded-full object-cover ring-2 ring-white/10" alt="{{ $user->name }}">
                         </div>
 
                         {{-- Name + actions --}}
@@ -31,7 +31,7 @@
                                 <h1 class="text-2xl font-semibold tracking-tight">{{ $user->name }}</h1>
                                 @auth
                                     @if(auth()->id() === $user->id)
-                                        <a href="#"
+                                        <a href="{{ route('profile.edit') }}"
                                             class="px-3 py-1 text-[11px] font-semibold uppercase tracking-wider border border-white/15 text-slate-400 hover:border-white/30 hover:text-white rounded-sm transition">
                                             Edit Profile
                                         </a>

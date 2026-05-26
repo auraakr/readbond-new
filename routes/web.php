@@ -49,6 +49,10 @@ Route::middleware('auth')->group(function () {
     // Global Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+    // Edit Profile
+    Route::get('/settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+
     // User Book Interactions
     Route::prefix('books')->name('books.')->group(function () {
         Route::post('/{id}/like',              [BooksController::class, 'toggleLike'])->name('like');

@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Models\Book;
 use App\Models\BookClub;
 use App\Models\BookRating;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -61,6 +63,45 @@ class ProfileController extends Controller
             'ratingsDistribution' => $ratingsDistribution,
             'booksThisYear' => $booksThisYear,
         ]);
+    }
+
+    public function edit()
+    {
+        return view('user.profile-edit', [
+            'user' => auth()->user()
+        ]);
+    }
+
+    public function update(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'name'     => 'required|string|max:255',
+            'username' => 'required|string|alpha_num|max:50|unique:users,username,' . $user->id,
+            'avatar'   => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Batasi mimes agar aman
+        ]);
+
+        $data = $request->only(['name', 'username']);
+
+        // Handling Avatar Image (Mengikuti pola update buku kamu)
+        if ($request->hasFile('avatar')) {
+            // Hapus avatar lama di storage jika ada (Gunakan kolom 'avatar')
+            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            // Simpan avatar baru ke folder 'avatars' di disk public
+            // Hasilnya: "avatars/nama_file.jpg"
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        } else {
+            // Jika tidak upload baru, tetap pertahankan path yang lama
+            $data['avatar'] = $user->avatar;
+        }
+
+        $user->update($data);
+
+        return redirect()->route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**

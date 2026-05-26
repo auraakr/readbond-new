@@ -54,7 +54,7 @@
         <div class="grid grid-cols-2 lg:flex lg:flex-wrap justify-center gap-6 mx-auto">
             {{-- Batasi hanya mengambil maksimal 4 Club teratas --}}
             @forelse($clubs->take(4) as $club)
-            <div class="bg-slate-900/40 text-center lg:w-60 hover:border-slate-700 hover:bg-slate-900 transition group flex flex-col justify-between h-full shadow-lg">
+            <div class="bg-slate-900/40 text-center lg:w-60 hover:border-slate-700 hover:bg-slate-900 transition group flex flex-col justify-between h-full">
                 
                 <div>
                     {{-- Bagian Atas: Cover & Badge Kategori --}}
@@ -95,12 +95,12 @@
                     <div class="flex items-center justify-center gap-2.5">
                         <div class="flex -space-x-2 overflow-hidden">
                             @foreach($club->members->take(3) as $member)
-                                @if($member->profile_photo_path)
-                                    <img class="inline-block h-6 w-6 rounded-full ring-2 ring-[#0a0a0f] object-cover" 
-                                        src="{{ asset('storage/' . $member->profile_photo_path) }}" 
+                                @if($member->avatar)
+                                    <img class="inline-block h-6 w-6 rounded-full border border-purple-200 object-cover" 
+                                        src="{{ $member->avatar ? asset('storage/' . $member->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($member->name).'&background=8b5cf6&color=fff&size=96' }}" 
                                         alt="{{ $member->name }}">
                                 @else
-                                    <div class="inline-block h-6 w-6 rounded-full ring-2 ring-[#0a0a0f] bg-purple-600 flex items-center justify-center text-[9px] font-bold text-white uppercase">
+                                    <div class="inline-block h-6 w-6 rounded-full border border-purple-200 bg-purple-600 flex items-center justify-center text-[9px] font-bold text-white uppercase">
                                         {{ substr($member->name, 0, 1) }}
                                     </div>
                                 @endif
@@ -108,7 +108,7 @@
 
                             {{-- Hitung sisa member --}}
                             @if($club->members_count > 3)
-                                <div class="inline-flex h-6 min-w-[24px] px-1 items-center justify-center rounded-full ring-2 ring-[#0a0a0f] bg-slate-800 text-[9px] font-medium text-slate-300">
+                                <div class="inline-flex h-6 min-w-[24px] px-1 items-center justify-center rounded-full ri-2 ring-purple-200 bg-slate-800 text-[9px] font-medium text-slate-300">
                                     +{{ $club->members_count - 3 }}
                                 </div>
                             @endif
