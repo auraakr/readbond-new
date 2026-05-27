@@ -36,9 +36,41 @@
                                             Edit Profile
                                         </a>
                                     @else
-                                        <button class="px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider bg-purple-600 hover:bg-purple-700 text-white rounded-sm transition">
-                                            Follow
-                                        </button>
+                                        {{-- ── KOMPONEN FOLLOW DENGAN ALPINE.JS ── --}}
+                                        <div x-data="{ 
+                                            isFollowed: {{ $isFollowed ? 'true' : 'false' }},
+                                            isLoading: false,
+                                            toggleFollow() {
+                                                if (this.isLoading) return;
+                                                this.isLoading = true;
+                                                
+                                                fetch('{{ route('user.follow', $user->id) }}', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                                        'Content-Type': 'application/json',
+                                                        'Accept': 'application/json'
+                                                    }
+                                                })
+                                                .then(res => res.json())
+                                                .then(data => {
+                                                    if(data.success) {
+                                                        this.isFollowed = data.is_following;
+                                                    }
+                                                })
+                                                .catch(err => console.error(err))
+                                                .finally(() => { this.isLoading = false; });
+                                            }
+                                        }">
+                                            <button @click="toggleFollow()" 
+                                                    :disabled="isLoading"
+                                                    :class="isFollowed 
+                                                        ? 'bg-slate-800 text-slate-300 border border-white/10 hover:bg-slate-700/80 hover:text-white' 
+                                                        : 'bg-purple-600 hover:bg-purple-700 text-white border border-transparent'"
+                                                    class="px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-sm transition disabled:opacity-50 select-none">
+                                                <span x-text="isFollowed ? 'Followed' : 'Follow'"></span>
+                                            </button>
+                                        </div>
                                     @endif
                                 @endauth
                             </div>

@@ -86,6 +86,10 @@ class ProfileController extends Controller
         // Ambil maksimal 4 buku favorit milik pengguna
         $favoriteBooks = $user->favoriteBooks()->latest()->take(4)->get();
 
+    $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+
         return view('user.profile-edit', compact('user', 'favoriteBooks'));
     }
 
@@ -259,8 +263,13 @@ class ProfileController extends Controller
         // Ambil semua aktivitas (tanpa limit)
         $allActivity = $this->getAllRecentActivity($user);
 
+    $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+
         return view('user.profile-activity', [
             'user' => $user,
+            'isFollowed' => $isFollowed,
             'allActivity' => $allActivity,
         ]);
     }
@@ -437,8 +446,13 @@ class ProfileController extends Controller
             ->orderBy('year', 'desc')
             ->pluck('year');
 
+        $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+
         return view('diary.index', [
             'user' => $user,
+            'isFollowed' => $isFollowed,
             'diaryLogs' => $diaryLogs,
             'calendarEntries' => $calendarEntries,
             'streak' => $streak,
@@ -469,7 +483,11 @@ class ProfileController extends Controller
             ->latest('finished_at')
             ->paginate(12);
 
-        return view('user.profile-books', compact('user', 'finishedBooks'));
+        $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+
+        return view('user.profile-books', compact('user', 'finishedBooks', 'isFollowed'));
     }
 
     /**
@@ -485,8 +503,13 @@ class ProfileController extends Controller
         // Ambil semua ulasan
         $allReviews = $this->getAllReviews($user);
 
+    $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+
         return view('user.profile-reviews', [
             'user' => $user,
+            'isFollowed' => $isFollowed,
             'allReviews' => $allReviews,
         ]);
     }
@@ -514,8 +537,13 @@ class ProfileController extends Controller
             ->latest()
             ->paginate(12);
 
+        $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+
         return view('user.profile-readlist', [
             'user' => $user,
+            'isFollowed' => $isFollowed,
             'readlistBooks' => $readlistBooks,
         ]);
     }
@@ -534,8 +562,13 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
+        $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+
         return view('user.profile-collections', [
             'user' => $user,
+            'isFollowed' => $isFollowed,
             'collections' => $collections,
         ]);
     }
@@ -553,7 +586,11 @@ class ProfileController extends Controller
                     ->orderBy('book_club_members.created_at', 'desc')
                     ->get();
 
-        return view('user.profile-clubs', compact('user', 'clubs'));
+        $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+
+        return view('user.profile-clubs', compact('user', 'clubs', 'isFollowed'));
     }
 
     public function addFavoriteBook(Request $request)
