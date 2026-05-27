@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Book;
 use App\Models\BookClub;
 use App\Models\BookRating;
+use App\Models\DiaryLog;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
@@ -377,6 +378,75 @@ class ProfileController extends Controller
             ->concat($diaries)
             ->sortByDesc('created_at')
             ->values();
+    }
+
+    public function diary(Request $request, $username)
+    {
+        // 1. Cari user berdasarkan username yang ada di URL
+        $user = User::where('username', $username)
+            ->withCount(['readingLogs as books_count'])
+            ->withCount(['followers as followers_count', 'following as following_count'])
+            ->firstOrFail();
+
+        $year = $request->input('year', now()->year);
+        $month = $request->input('month', now()->month);
+
+        // Get diary logs untuk bulan ini
+        $diaryQuery = $user->diaryLogs()
+            ->with(['book:id,external_id,title,author_name,cover'])
+            ->whereYear('read_date', $year)
+            ->whereMonth('read_date', $month);
+
+        $diaryLogs = $diaryQuery->orderBy('read_date', 'desc')->paginate(5);
+
+        // Get all diary logs for calendar (hanya untuk bulan yang ditampilkan)
+        $calendarEntries = $user->diaryLogs()
+            ->with(['book:id,external_id,title,cover'])
+            ->whereYear('read_date', $year)
+            ->whereMonth('read_date', $month)
+            ->get()
+            ->groupBy(function($log) {
+                return $log->read_date->format('Y-m-d');
+            })
+            ->map(function($logs) {
+                // Ambil max 4 cover buku per hari
+                return $logs->take(4)->map(function($log) {
+                    return [
+                        'book_id' => $log->book_id,
+                        'cover' => $log->book->cover_url ?? null,
+                        'title' => $log->book->title ?? 'Unknown',
+                        'mood' => $log->mood,
+                    ];
+                });
+            });
+
+        // Calculate streak
+        $streak = DiaryLog::calculateStreak($user->id);
+
+        // Get stats for this year
+        $stats = [
+            'total_entries' => $user->diaryLogs()->thisYear()->count(),
+            'total_books' => $user->diaryLogs()->thisYear()->distinct('book_id')->count(),
+            'total_pages' => $user->diaryLogs()->thisYear()->sum('pages_read'),
+            'this_month' => $user->diaryLogs()->thisMonth()->count(),
+        ];
+
+        // Get available years
+        $availableYears = $user->diaryLogs()
+            ->selectRaw('DISTINCT YEAR(read_date) as year')
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        return view('diary.index', [
+            'user' => $user,
+            'diaryLogs' => $diaryLogs,
+            'calendarEntries' => $calendarEntries,
+            'streak' => $streak,
+            'stats' => $stats,
+            'currentYear' => $year,
+            'currentMonth' => $month,
+            'availableYears' => $availableYears,
+        ]);
     }
 
     /**

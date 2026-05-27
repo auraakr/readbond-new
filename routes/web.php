@@ -147,6 +147,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/readlist',    [ProfileController::class, 'readlist'])->name('readlist');
         Route::get('/collections', [ProfileController::class, 'collections'])->name('collections');
         Route::get('/clubs',       [ProfileController::class, 'clubs'])->name('clubs');
+        Route::get('/diary',       [ProfileController::class, 'diary'])->name('diary');
     });
 
     // Main Profile Catch-All (Garis finish terakhir)

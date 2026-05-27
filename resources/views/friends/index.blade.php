@@ -64,6 +64,7 @@
                             }
                         }">
                         
+                        <a href="{{ route('profile', $member->username) }}">
                         @if($member->avatar_url)
                             <img src="{{ $member->avatar_url }}" alt="{{ $member->name }}" 
                                 class="w-full h-full rounded-full object-cover border-2 border-slate-800 group-hover:border-purple-500/50 transition duration-300">
@@ -72,6 +73,7 @@
                                 {{ substr($member->name ?? $member->username, 0, 1) }}
                             </div>
                         @endif
+                        </a>
 
                         {{-- Follow Button --}}
                         @if(Auth::id() !== $member->id)
@@ -98,9 +100,10 @@
                     </div>
 
                     {{-- Informasi Profil --}}
-                    <a href="{{ route('profile', ['user' => $member->username]) }}" class="font-semibold text-slate-200 hover:text-purple-400 transition text-sm truncate w-full px-2">
+                    <a href="{{ route('profile', $member->username) }}" class="font-semibold text-slate-200 hover:text-purple-400 transition text-sm truncate w-full px-2">
                         {{ $member->name ?? $member->username }}
                     </a>
+                    <p class="text-xs text-slate-500">@\{{ $member->username }}</p>
                     <p class="text-[11px] text-slate-500 mt-0.5 tracking-wide">
                         {{ number_format($member->books_count) }} books • {{ number_format($member->reviews_count) }} reviews
                     </p>
@@ -184,14 +187,16 @@
                             }
                         }">
                         
-                        @if($member->avatar_url)
-                            <img src="{{ $member->avatar_url }}" alt="{{ $member->name }}" 
-                                class="w-full h-full rounded-full object-cover border-2 border-slate-800 group-hover:border-purple-500/50 transition duration-300">
-                        @else
-                            <div class="w-full h-full rounded-full bg-slate-800 text-slate-400 border-2 border-slate-700 flex items-center justify-center text-2xl font-bold uppercase group-hover:border-purple-500/50 transition duration-300">
-                                {{ substr($member->name ?? $member->username, 0, 1) }}
-                            </div>
-                        @endif
+                        <a href="{{ route('profile', $member->username) }}">
+                            @if($member->avatar_url)
+                                <img src="{{ $member->avatar_url }}" alt="{{ $member->name }}" 
+                                    class="w-full h-full rounded-full object-cover border-2 border-slate-800 group-hover:border-purple-500/50 transition duration-300">
+                            @else
+                                <div class="w-full h-full rounded-full bg-slate-800 text-slate-400 border-2 border-slate-700 flex items-center justify-center text-2xl font-bold uppercase group-hover:border-purple-500/50 transition duration-300">
+                                    {{ substr($member->name ?? $member->username, 0, 1) }}
+                                </div>
+                            @endif
+                        </a>
 
                         {{-- Follow Button --}}
                         @if(Auth::id() !== $member->id)
@@ -218,9 +223,10 @@
                     </div>
 
                     {{-- Informasi Profil --}}
-                    <a href="{{ route('profile', ['user' => $member->username]) }}" class="font-semibold text-slate-200 hover:text-purple-400 transition text-sm truncate w-full px-2">
+                    <a href="{{ route('profile', $member->username) }}" class="font-semibold text-slate-200 hover:text-purple-400 transition text-sm truncate w-full px-2">
                         {{ $member->name ?? $member->username }}
                     </a>
+                    <p class="text-xs text-slate-500">@\{{ $member->username }}</p>
                     <p class="text-[11px] text-slate-500 mt-0.5 tracking-wide">
                         {{ number_format($member->books_count) }} books • {{ number_format($member->reviews_count) }} reviews
                     </p>
