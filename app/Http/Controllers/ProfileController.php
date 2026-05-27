@@ -19,8 +19,8 @@ class ProfileController extends Controller
         // 1. Ambil data user beserta count relasinya
         $user = User::where('username', $username)
             ->withCount(['readingLogs as books_count'])
+            ->withCount(['followers as followers_count', 'following as following_count'])
             ->withCount(['readingLists as readlist_count'])
-            ->withCount(['following as following_count'])
             ->firstOrFail();
 
         $user->avatar_url = !empty($user->avatar)
@@ -252,6 +252,7 @@ class ProfileController extends Controller
     {
         $user = User::where('username', $username)
             ->withCount(['readingLogs as books_count'])
+            ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
         // Ambil semua aktivitas (tanpa limit)
@@ -385,6 +386,7 @@ class ProfileController extends Controller
     {
         $user = User::where('username', $username)
             ->withCount(['readingLogs as books_count'])
+            ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
         // CARA TERBAIK: Ambil buku yang selesai + rating-nya sekaligus menggunakan relasi
@@ -407,6 +409,7 @@ class ProfileController extends Controller
     {
         $user = User::where('username', $username)
             ->withCount(['readingLogs as books_count'])
+            ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
         // Ambil semua ulasan
@@ -432,6 +435,7 @@ class ProfileController extends Controller
     {
         $user = User::where('username', $username)
             ->withCount(['readingLogs as books_count'])
+            ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
         // Ambil semua buku di readlist
@@ -450,6 +454,7 @@ class ProfileController extends Controller
     {
         $user = User::where('username', $username)
             ->withCount(['readingLogs as books_count'])
+            ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
         // Ambil semua koleksi user
@@ -467,7 +472,10 @@ class ProfileController extends Controller
 
     public function clubs($username)
     {
-        $user = User::where('username', $username)->firstOrFail();
+        $user = User::where('username', $username)
+            ->withCount(['readingLogs as books_count'])
+            ->withCount(['followers as followers_count', 'following as following_count'])
+            ->firstOrFail();
 
         // Ambil semua club yang diikuti atau didirikan oleh user tersebut
         $clubs = $user->clubs() // Asumsi nama relasi BelongsToMany ke BookClub di model User adalah clubs()

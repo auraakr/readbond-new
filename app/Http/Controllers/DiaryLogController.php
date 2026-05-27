@@ -18,6 +18,7 @@ class DiaryLogController extends Controller
     {
         $user = User::where('id', Auth::id())
             ->withCount(['readingLogs as books_count'])
+            ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
         
         $year = $request->input('year', now()->year);
