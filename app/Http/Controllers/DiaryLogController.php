@@ -17,7 +17,9 @@ class DiaryLogController extends Controller
     public function index(Request $request)
     {
         $user = User::where('id', Auth::id())
-            ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
         

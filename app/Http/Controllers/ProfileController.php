@@ -19,7 +19,9 @@ class ProfileController extends Controller
     {
         // 1. Ambil data user beserta count relasinya
         $user = User::where('username', $username)
-            ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->withCount(['readingLists as readlist_count'])
             ->firstOrFail();
@@ -256,7 +258,9 @@ class ProfileController extends Controller
     public function activity($username)
     {
         $user = User::where('username', $username)
-            ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
@@ -393,7 +397,9 @@ class ProfileController extends Controller
     {
         // 1. Cari user berdasarkan username yang ada di URL
         $user = User::where('username', $username)
-            ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
@@ -469,7 +475,9 @@ class ProfileController extends Controller
     public function books($username)
     {
         $user = User::where('username', $username)
-            ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
@@ -496,7 +504,9 @@ class ProfileController extends Controller
     public function reviews($username)
     {
         $user = User::where('username', $username)
-            ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
@@ -527,7 +537,9 @@ class ProfileController extends Controller
     public function readlist($username)
     {
         $user = User::where('username', $username)
-            ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
@@ -551,7 +563,9 @@ class ProfileController extends Controller
     public function collections($username)
     {
         $user = User::where('username', $username)
-            ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
@@ -576,7 +590,9 @@ class ProfileController extends Controller
     public function clubs($username)
     {
         $user = User::where('username', $username)
-            ->withCount(['readingLogs as books_count'])
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->firstOrFail();
 
