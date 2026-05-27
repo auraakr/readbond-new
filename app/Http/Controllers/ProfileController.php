@@ -8,6 +8,7 @@ use App\Models\BookClub;
 use App\Models\BookRating;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -79,9 +80,12 @@ class ProfileController extends Controller
 
     public function edit()
     {
-        return view('user.profile-edit', [
-            'user' => auth()->user()
-        ]);
+        $user = auth()->user();
+    
+        // Ambil maksimal 4 buku favorit milik pengguna
+        $favoriteBooks = $user->favoriteBooks()->latest()->take(4)->get();
+
+        return view('user.profile-edit', compact('user', 'favoriteBooks'));
     }
 
     public function update(Request $request)
@@ -472,5 +476,70 @@ class ProfileController extends Controller
                     ->get();
 
         return view('user.profile-clubs', compact('user', 'clubs'));
+    }
+
+    public function addFavoriteBook(Request $request)
+    {
+        $request->validate([
+            'book_id'     => 'nullable|integer',
+            'external_id' => 'nullable|string',
+            'position'    => 'required|integer|min:0|max:3',
+        ]);
+
+        $bookId = $request->book_id;
+
+        // Resolve from external_id if no local book_id provided
+        if (!$bookId && $request->external_id) {
+            $book = Book::where('external_id', $request->external_id)->first();
+
+            if (!$book) {
+                try {
+                    $data = Http::timeout(15)
+                        ->get("https://openlibrary.org/works/{$request->external_id}.json")
+                        ->json();
+
+                    $title = $data['title'] ?? 'Unknown';
+                    $coverId = $data['covers'][0] ?? null;
+
+                    $authorName = 'Unknown';
+                    if (!empty($data['authors'][0]['author']['key'])) {
+                        $authorKey = $data['authors'][0]['author']['key'];
+                        $authorData = Http::timeout(5)->get("https://openlibrary.org{$authorKey}.json")->json();
+                        $authorName = $authorData['name'] ?? 'Unknown';
+                    }
+
+                    $book = Book::create([
+                        'external_id' => $request->external_id,
+                        'title'       => $title,
+                        'author_name' => $authorName,
+                        'cover'   => $coverId
+                            ? "https://covers.openlibrary.org/b/id/{$coverId}-M.jpg"
+                            : null,
+                    ]);
+                } catch (\Exception $e) {
+                    return response()->json(['success' => false, 'message' => 'Gagal mengambil data buku dari Open Library.'], 422);
+                }
+            }
+
+            $bookId = $book->id;
+        }
+
+        if (!$bookId || !Book::find($bookId)) {
+            return response()->json(['success' => false, 'message' => 'Buku tidak ditemukan.'], 422);
+        }
+
+        $user = auth()->user();
+        $user->favoriteBooks()->wherePivot('order_position', $request->position)->detach();
+        $user->favoriteBooks()->attach($bookId, ['order_position' => $request->position]);
+
+        return response()->json(['success' => true]);
+    }
+
+    public function removeFavoriteBook($id)
+    {
+        $user = auth()->user();
+        $user->favoriteBooks()->detach($id);
+
+        return response()->json(['success' => true]);
     }
 }

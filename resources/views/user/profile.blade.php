@@ -23,9 +23,9 @@
                     <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mb-4">Favorite Books</p>
                     <div class="grid grid-cols-4 gap-3">
                         @foreach($user->favoriteBooks ?? [] as $book)
-                        <a href="#" class="group block aspect-[3/4] rounded-sm overflow-hidden bg-slate-800 border border-white/5 hover:border-purple-500/50 transition">
-                            @if($book->cover_url)
-                                <img src="{{ $book->cover_url }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $book->title }}">
+                        <a href="#" class="group block aspect-[3/5] rounded-sm overflow-hidden bg-slate-800 border border-white/5 hover:border-purple-500/50 transition">
+                            @if($book->cover)
+                                <img src="{{ $book->cover }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $book->title }}">
                             @else
                                 <div class="w-full h-full flex items-center justify-center text-slate-600 text-xs p-3 text-center leading-snug">{{ $book->title }}</div>
                             @endif
@@ -33,7 +33,7 @@
                         @endforeach
                         {{-- Empty slots --}}
                         @for($i = count($user->favoriteBooks ?? []); $i < 4; $i++)
-                        <div class="aspect-[3/4] rounded-sm bg-slate-800/50 border border-dashed border-white/5"></div>
+                        <div class="aspect-[3/5] rounded-sm bg-slate-800/50 border border-dashed border-white/5"></div>
                         @endfor
                     </div>
                 </section>

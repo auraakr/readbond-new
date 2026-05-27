@@ -12,6 +12,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DiaryLogController;
 use App\Http\Controllers\FriendsController;
 use App\Http\Controllers\FollowController;
+use App\Http\Controllers\BookSearchController;
 use App\Http\Controllers\Admin\BookController as AdminBookController;
 use App\Http\Controllers\BookClubController;
 
@@ -52,6 +53,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::get('/settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+
+    // API Pencarian Buku untuk Modal Favorit
+    Route::get('/api/books/search', [BookSearchController::class, 'search'])->name('api.books.search');
+    
+    // Aksi Simpan & Hapus Buku Favorit
+    Route::post('/settings/favorite-books', [ProfileController::class, 'addFavoriteBook'])->name('profile.favorite.add');
+    Route::delete('/settings/favorite-books/{id}', [ProfileController::class, 'removeFavoriteBook'])->name('profile.favorite.remove');
 
     // 2. FRIENDS & SOCIAL INTERACTIONS (Aksi Statis)
     Route::get('/friends', [FriendsController::class, 'index'])->name('friends.index');

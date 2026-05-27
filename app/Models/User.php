@@ -194,4 +194,13 @@ class User extends Authenticatable
             return true; // Now following
         }
     }
+
+    // Relasi ke tabel buku melalui tabel pivot favorit
+    public function favoriteBooks()
+    {
+        return $this->belongsToMany(Book::class, 'book_user_favorites')
+                    ->withPivot('order_position')
+                    ->orderBy('book_user_favorites.order_position', 'asc')
+                    ->withTimestamps();
+    }
 }
