@@ -73,7 +73,7 @@
             @if($book->cover)
             <div class="pt-4 border-t border-white/5">
                 <p class="text-xs text-slate-500 mb-2">Current Cover:</p>
-                <img src="{{ asset('storage/' . $book->cover) }}" class="h-32 rounded-lg border border-white/10 shadow-lg">
+                <img src="{{ $book->cover_url }}" class="h-32 rounded-lg border border-white/10 shadow-lg">
             </div>
             @endif
         </div>

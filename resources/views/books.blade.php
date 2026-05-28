@@ -113,7 +113,7 @@
                                 group-hover:border-purple-100">
                         @if($book->cover)
                             <img
-                                src="{{ $book->cover }}"
+                                src="{{ $book->cover_url }}"
                                 alt="{{ $book->title }}"
                                 class="w-full h-full object-cover"
                                 loading="lazy"
