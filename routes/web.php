@@ -18,6 +18,7 @@ use App\Http\Controllers\BookClubController;
 // admin
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,9 +52,7 @@ Route::middleware('guest')->group(function () {
 */
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     // Resource CRUD Books untuk Admin
     Route::resource('books', BookController::class);
