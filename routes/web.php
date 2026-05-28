@@ -13,8 +13,10 @@ use App\Http\Controllers\DiaryLogController;
 use App\Http\Controllers\FriendsController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\BookSearchController;
-use App\Http\Controllers\Admin\BookController as AdminBookController;
 use App\Http\Controllers\BookClubController;
+
+// admin
+use App\Http\Controllers\Admin\BookController;
 
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +42,21 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
+/*
+|--------------------------------------------------------------------------
+| 3. ADMIN ROUTES
+|--------------------------------------------------------------------------
+| Area eksklusif administrator. Menggunakan prefix dan name spacing 'admin.'.
+*/
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard');
+    })->name('dashboard');
+    
+    // Resource CRUD Books untuk Admin
+    Route::resource('books', BookController::class);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -153,21 +170,4 @@ Route::middleware('auth')->group(function () {
     // Main Profile Catch-All (Garis finish terakhir)
     Route::get('/{user:username}', [ProfileController::class, 'show'])->name('profile');
 
-});
-
-
-/*
-|--------------------------------------------------------------------------
-| 3. ADMIN ROUTES
-|--------------------------------------------------------------------------
-| Area eksklusif administrator. Menggunakan prefix dan name spacing 'admin.'.
-*/
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
-    
-    // Resource CRUD Books untuk Admin
-    Route::resource('books', AdminBookController::class);
 });
