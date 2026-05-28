@@ -18,4 +18,14 @@ class ReviewReport extends Model
     {
         return $this->hasMany(ReviewReport::class, 'book_review_id');
     }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    function bookReview()
+    {
+        return $this->belongsTo(BookReview::class);
+    }
 }

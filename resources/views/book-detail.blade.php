@@ -71,9 +71,25 @@
                     <span class="text-slate-400 text-sm">{{ number_format($book->averageRating, 1) }} / 5</span>
                 </div>
 
-                <p class="mt-5 text-slate-400 text-sm leading-relaxed max-w-xl mx-auto lg:mx-0">
-                    {{ Str::limit($book->desc, 280) }}
-                </p>
+                <div x-data="{ expanded: false }" class="mt-5 text-slate-400 text-sm leading-relaxed max-w-xl mx-auto lg:mx-0">
+                    @if(Str::length($book->desc) > 280)
+                        {{-- Tampilkan teks limit saat 'expanded' false, dan teks penuh saat 'expanded' true --}}
+                        <p>
+                            <span x-show="!expanded">{{ Str::limit($book->desc, 280, '...') }}</span>
+                            <span x-show="expanded" style="display: none;">{{ $book->desc }}</span>
+                            
+                            {{-- Tombol Toggle --}}
+                            <button 
+                                @click="expanded = !expanded" 
+                                class="text-purple-400 hover:text-purple-300 font-semibold ml-1 focus:outline-none transition inline-block"
+                                x-text="expanded ? 'Sembunyikan' : 'Selengkapnya'">
+                            </button>
+                        </p>
+                    @else
+                        {{-- Jika teks kurang dari 280 karakter, tampilkan biasa tanpa tombol --}}
+                        <p>{{ $book->desc }}</p>
+                    @endif
+                </div>
 
                 {{-- Action Buttons --}}
                 <div class="mt-8 flex flex-wrap gap-3 justify-center lg:justify-start">

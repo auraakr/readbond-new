@@ -17,6 +17,7 @@ use App\Http\Controllers\BookClubController;
 
 // admin
 use App\Http\Controllers\Admin\BookController;
+use App\Http\Controllers\Admin\ReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,6 +57,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     
     // Resource CRUD Books untuk Admin
     Route::resource('books', BookController::class);
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::patch('/reports/{id}/dismiss', [ReportController::class, 'dismiss'])->name('reports.dismiss');
+    Route::delete('/reports/{id}/review', [ReportController::class, 'destroyReview'])->name('reports.destroyReview');
 });
 
 /*
