@@ -127,15 +127,47 @@
                     </div>
 
                     {{-- Info --}}
+                    <div class="flex justify-between items-center mb-1">
+                        {{-- book rating --}}
+                        @if(!empty($book['averageRating']))
+                            <div class="flex items-center tracking-tighter">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <= $book['averageRating'])
+                                        <x-heroicon-s-star class="w-3 h-3 text-amber-400" />
+                                    @else
+                                        <x-heroicon-o-star class="w-3 h-3 text-slate-400" />
+                                    @endif
+                                @endfor
+                                <span class="text-slate-400 text-[10px] mx-1">{{ number_format($book->averageRating, 1) }}</span>
+                            </div>
+                        @else
+                            <div class="flex items-center text-slate-400 text-[10px] tracking-tighter">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <x-heroicon-o-star class="w-3 h-3" />
+                                @endfor
+                                <span class="text-slate-400 text-[10px] mx-1">{{ number_format($book->averageRating, 1) }}</span>
+                            </div>
+                        @endif
+                        {{-- likes count --}}
+                        {{-- Sisi Kanan: Jumlah Orang yang Like --}}
+                        <div class="flex items-center gap-1 text-slate-400 group">
+                            {{-- Icon Hati Semacam Letterboxd --}}
+                            <svg class="w-3.5 h-3.5 {{ $book->likes_count > 0 ? 'text-pink-600 fill-pink-600' : 'text-slate-600' }}" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                            {{-- Teks Angka --}}
+                            <span class="text-[11px] font-medium text-slate-400">{{ $book->likes_count ?? 0 }}</span>
+                        </div>
+                    </div>
                     <h3 class="text-white text-xs font-semibold leading-tight truncate group-hover:text-purple-300 transition">
                         {{ $book->title }}
+                        @if($book->year)
+                            <i class="text-slate-600 text-[10px] mt-0.5">({{ $book->year }})</i>
+                        @endif
                     </h3>
-                    <p class="text-slate-500 text-[11px] mt-0.5 truncate">
-                        {{ $book->author_name ?? 'Unknown Author' }}
-                    </p>
-                    @if($book->year)
-                        <p class="text-slate-600 text-[10px] mt-0.5">{{ $book->year }}</p>
-                    @endif
                 </a>
             @endforeach
         </div>
@@ -195,9 +227,9 @@
                             <div class="flex items-center text-amber-400 text-[10px] tracking-tighter">
                                 @for($i = 1; $i <= 5; $i++)
                                     @if($i <= $review['rating'])
-                                        ★
+                                        <x-heroicon-s-star class="w-3 h-3 text-amber-400" />
                                     @else
-                                        <span class="text-slate-700">★</span>
+                                        <x-heroicon-o-star class="w-3 h-3 text-slate-400" />
                                     @endif
                                 @endfor
                             </div>
@@ -261,9 +293,9 @@
                                 <div class="flex items-center text-amber-400 text-md tracking-tighter">
                                     @for($i = 1; $i <= 5; $i++)
                                         @if($i <= $review['rating'])
-                                            ★
+                                            <x-heroicon-s-star class="w-3 h-3 text-amber-400" />
                                         @else
-                                            <span class="text-slate-700">★</span>
+                                            <x-heroicon-o-star class="w-3 h-3 text-slate-400" />
                                         @endif
                                     @endfor
                                 </div>

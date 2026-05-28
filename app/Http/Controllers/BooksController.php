@@ -28,7 +28,9 @@ class BooksController extends Controller
         $sort  = $request->input('sort', 'popular'); // popular, recent, top_rated
 
         // Query builder - hanya ambil buku dengan external_id (valid books)
-        $booksQuery = Book::query()->whereNotNull('external_id');
+        $booksQuery = Book::query()
+            ->whereNotNull('external_id')
+            ->withCount('likes');
 
         // Filter search
         if ($query) {
