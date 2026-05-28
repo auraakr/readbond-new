@@ -85,16 +85,16 @@
                                        text-white text-sm font-semibold rounded-lg transition shadow-lg shadow-purple-900/40">
                             <x-heroicon-o-book-open class="w-4 h-4" />
                             @if($userReadingLog)
-                                {{ ['want_to_read' => 'Ingin Baca', 'reading' => 'Sedang Baca', 'finished' => 'Selesai Baca'][$userReadingLog->status] }}
+                                {{ ['want_to_read' => 'Want to Read', 'reading' => 'Currently Reading', 'finished' => 'Finished Reading'][$userReadingLog->status] }}
                             @else
-                                Tandai Dibaca
+                                Read
                             @endif
                         </button>
                     @else
                         <a href="{{ route('login') }}"
                            class="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-500
                                   text-white text-sm font-semibold rounded-lg transition shadow-lg shadow-purple-900/40">
-                            <x-heroicon-o-book-open class="w-4 h-4" /> Tandai Dibaca
+                            <x-heroicon-o-book-open class="w-4 h-4" /> Read
                         </a>
                     @endauth
 
@@ -107,7 +107,7 @@
                                            ? 'bg-blue-600 border-blue-500 hover:bg-blue-500'
                                            : 'bg-slate-700 border-slate-600 hover:bg-slate-600' }}">
                             <x-heroicon-o-bookmark class="w-4 h-4" />
-                            <span id="readlist-label">{{ $userInReadlist ? 'Di Readlist' : 'Readlist' }}</span>
+                            <span id="readlist-label">{{ $userInReadlist ? 'In Readlist' : 'Readlist' }}</span>
                         </button>
                     @else
                         <a href="{{ route('login') }}"
@@ -117,18 +117,18 @@
                         </a>
                     @endauth
 
-                    {{-- Tambah ke Koleksi --}}
+                    {{-- Tambah ke Collection --}}
                     @auth
                         <button onclick="openModal('modal-collection')"
                                 class="flex items-center gap-2 px-5 py-2.5 bg-slate-700 hover:bg-slate-600
                                        text-white text-sm font-semibold rounded-lg transition border border-slate-600">
-                            <x-heroicon-o-squares-plus class="w-4 h-4" /> Koleksi
+                            <x-heroicon-o-squares-plus class="w-4 h-4" /> Collection
                         </button>
                     @else
                         <a href="{{ route('login') }}"
                            class="flex items-center gap-2 px-5 py-2.5 bg-slate-700 hover:bg-slate-600
                                   text-white text-sm font-semibold rounded-lg transition border border-slate-600">
-                            <x-heroicon-o-squares-plus class="w-4 h-4" /> Koleksi
+                            <x-heroicon-o-squares-plus class="w-4 h-4" /> Collection
                         </a>
                     @endauth
 
@@ -198,12 +198,12 @@
                         <button onclick="openModal('modal-collection')"
                                 class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
                                        font-medium rounded-lg transition border border-slate-600 mb-2">
-                            + Koleksi
+                            + Collection
                         </button>
                         <button onclick="toggleReadlist()"
                                 class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
                                        font-medium rounded-lg transition border border-slate-600">
-                            {{ $userInReadlist ? '✓ Di Readlist' : '+ Ke Readlist' }}
+                            {{ $userInReadlist ? '✓ In Readlist' : '+ To Readlist' }}
                         </button>
                     @else
                         <a href="{{ route('login') }}"
@@ -214,7 +214,7 @@
                         <a href="{{ route('login') }}"
                            class="block w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
                                   font-medium rounded-lg transition border border-slate-600 mb-2 text-center">
-                            + Koleksi
+                            + Collection
                         </a>
                         <a href="{{ route('login') }}"
                            class="block w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
@@ -311,8 +311,7 @@
                         <div class="flex items-start justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 @if($review['user_avatar'])
-                                    <img src="{{ $review['user_avatar'] }}" alt="{{ $review['user_name'] }}" 
-                                         class="w-10 h-10 rounded-full object-cover">
+                                    <img src="{{ $review['user_avatar'] }}" alt="{{ $review['user_name'] }}" class="w-10 h-10 rounded-full object-cover">
                                 @else
                                     <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 text-sm font-bold">
                                         {{ strtoupper(substr($review['user_name'], 0, 1)) }}
@@ -323,14 +322,23 @@
                                     <p class="text-slate-500 text-xs">{{ $review['created_at'] }}</p>
                                 </div>
                             </div>
+
+                            {{-- ── TOMBOL REPORT DI POJOK KANAN ── --}}
+                            @auth
+                                @if(auth()->id() !== $review['user_id']) {{-- User tidak bisa me-report review-nya sendiri --}}
+                                    <button onclick="openReportModal({{ $review['id'] }})" class="text-slate-500 hover:text-red-400 transition text-[11px] font-medium flex items-center gap-1">
+                                        <x-heroicon-o-flag class="w-4 h-4" />
+                                        Report
+                                    </button>
+                                @endif
+                            @endauth
                         </div>
 
                         {{-- Rating Stars --}}
                         <div class="flex items-center gap-2 mb-3">
                             <div class="flex gap-1">
                                 @for($i = 1; $i <= 5; $i++)
-                                    <svg class="w-3.5 h-3.5 {{ $i <= $review['rating'] ? 'text-yellow-400' : 'text-slate-600' }}" 
-                                         fill="currentColor" viewBox="0 0 20 20">
+                                    <svg class="w-3.5 h-3.5 {{ $i <= $review['rating'] ? 'text-yellow-400' : 'text-slate-600' }}" fill="currentColor" viewBox="0 0 20 20">
                                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                     </svg>
                                 @endfor
@@ -340,43 +348,18 @@
 
                         {{-- Review Text --}}
                         @if($review['review'])
-                            <p class="text-slate-300 text-sm leading-relaxed">
+                            <p class="text-slate-300 text-sm leading-relaxed mb-3">
                                 {{ $review['review'] }}
                             </p>
                         @endif
 
-                        {{-- Dynamic Interaction Button (Like Review) --}}
+                        {{-- Like Button Interaction --}}
                         <div>
-                            @auth
-                                <button onclick="toggleLikeReview({{ $review['id'] }})" 
-                                        id="review-like-btn-{{ $review['id'] }}"
-                                        class="flex items-center gap-1.5 py-3 text-xs font-semibold transition
-                                        {{ $review['is_liked'] 
-                                            ? 'font-bold' 
-                                            : 'text-slate-400 hover:text-slate-300' }}">
-                                    <svg class="w-5 h-5 {{ $review['is_liked'] ? 'fill-current' : 'fill-none' }}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                                    </svg>
-                                    <span id="review-like-count-{{ $review['id'] }}">{{ $review['likes_count'] ?? 0 }} Likes</span>
-                                </button>
-                            @else
-                                <a href="{{ route('login') }}" 
-                                    class="flex items-center gap-1.5 px-3 py-1.5 border text-slate-400 rounded-full text-xs hover:text-slate-300 transition">
-                                    <svg class="w-5 h-5 fill-none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                                    </svg>
-                                    <span>{{ $review['likes_count'] ?? 0 }} Likes</span>
-                                </a>
-                            @endauth
+                            {{-- Bagian tombol Like milikmu tetap di sini --}}
                         </div>
                     </div>
                 @empty
-                    <div class="text-center py-10 text-slate-500">
-                        <svg class="w-12 h-12 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p class="text-sm">Belum ada review untuk buku ini.</p>
-                    </div>
+                    {{-- Kondisi kosong --}}
                 @endforelse
             </div>
         </div>
@@ -416,12 +399,12 @@
                     <button onclick="openModal('modal-collection')"
                             class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
                                    font-medium rounded-lg transition border border-slate-600">
-                        + Koleksi
+                        + Collection
                     </button>
                     <button onclick="toggleReadlist()"
                             class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white text-xs
                                    font-medium rounded-lg transition border border-slate-600">
-                        {{ $userInReadlist ? '✓ Di Readlist' : '+ Ke Readlist' }}
+                        {{ $userInReadlist ? '✓ In Readlist' : '+ To Readlist' }}
                     </button>
                 </div>
             </div>
@@ -434,7 +417,7 @@
      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4">
     <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 w-full max-w-md shadow-2xl">
         <div class="flex justify-between items-center mb-5">
-            <h3 class="text-white font-bold text-lg">Tambah ke Koleksi</h3>
+            <h3 class="text-white font-bold text-lg">Add to Collection</h3>
             <button onclick="closeModal('modal-collection')" class="text-slate-500 hover:text-white transition">
                 <x-heroicon-o-x-mark class="w-5 h-5" />
             </button>
@@ -442,11 +425,11 @@
 
         @if($userCollections->isEmpty())
             <div class="text-center py-6">
-                <p class="text-slate-400 text-sm mb-4">Kamu belum punya koleksi.</p>
+                <p class="text-slate-400 text-sm mb-4">Kamu belum punya Collection.</p>
                 <a href="{{ route('collections.create') }}"
                    class="inline-block px-5 py-2 bg-purple-600 hover:bg-purple-500
                           text-white text-sm font-semibold rounded-lg transition">
-                    Buat Koleksi Baru
+                    Buat Collection Baru
                 </a>
             </div>
         @else
@@ -472,11 +455,42 @@
                class="block w-full py-2.5 border border-dashed border-slate-600 text-slate-400
                       hover:border-purple-500 hover:text-purple-300 text-sm text-center
                       rounded-sm transition">
-                + Buat Koleksi Baru
+                + Buat Collection Baru
             </a>
         @endif
     </div>
 </div>
+
+{{-- ── FORM MODAL REPORT (Taruh di bagian paling bawah body blade kamu) ── --}}
+@auth
+<div id="reportModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/70 backdrop-blur-sm p-4">
+    <div class="bg-slate-900 border border-slate-800 w-full max-w-md rounded-xl p-6 shadow-2xl">
+        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            ⚠️ Report a Review
+        </h3>
+        <form id="reportForm" onsubmit="submitReport(event)">
+            <input type="hidden" id="reportReviewId" value="">
+            
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Issue</label>
+            <select id="reportReason" class="w-full bg-slate-800 text-white border border-slate-700 rounded-lg p-2.5 text-sm focus:border-purple-500 focus:ring-0 mb-4" required>
+                <option value="">Why this review is problematic...</option>
+                <option value="Contains Spoilers">Contains Spoilers</option>
+                <option value="Spam / Harassment">Spam / Harassment</option>
+                <option value="Inappropriate Content">Inappropriate Content</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Additional Notes (Optional)</label>
+            <textarea id="reportNotes" rows="3" class="w-full bg-slate-800 text-white border border-slate-700 rounded-lg p-2.5 text-sm focus:border-purple-500 focus:ring-0 mb-5" placeholder="Enter additional details..."></textarea>
+
+            <div class="flex justify-end gap-3 text-xs font-semibold uppercase tracking-wider">
+                <button type="button" onclick="closeReportModal()" class="px-4 py-2.5 text-slate-400 hover:text-white transition">Cancel</button>
+                <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md transition">Submit Report</button>
+            </div>
+        </form>
+    </div>
+</div>
+@endauth
 
 <script>
 // ── Tab switching ──
@@ -637,5 +651,43 @@ async function toggleReadlist() {
         }
     } catch(e) { console.error(e); }
 }
+
+function openReportModal(reviewId) {
+    document.getElementById('reportReviewId').value = reviewId;
+    document.getElementById('reportModal').classList.remove('hidden');
+}
+
+function closeReportModal() {
+    document.getElementById('reportModal').classList.add('hidden');
+    document.getElementById('reportForm').reset();
+}
+
+function submitReport(e) {
+    e.preventDefault();
+    
+    const reviewId = document.getElementById('reportReviewId').value;
+    const reason = document.getElementById('reportReason').value;
+    const notes = document.getElementById('reportNotes').value;
+
+    fetch(`/reviews/${reviewId}/report`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ reason, notes })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message); // Kamu bisa ganti pakai Toast Notification yang estetik
+        closeReportModal();
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Terjadi kesalahan pada sistem.');
+    });
+}
+
 </script>
 @endsection

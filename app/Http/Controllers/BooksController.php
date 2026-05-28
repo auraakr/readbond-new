@@ -282,6 +282,7 @@ class BooksController extends Controller
 
                 return [
                     'id' => $review->id,
+                    'user_id' => $review->user_id,
                     'user_name' => $review->user->name,
                     'user_avatar' => $avatarUrl, // Sekarang nilainya bisa URL valid atau null
                     'rating' => $review->rating,

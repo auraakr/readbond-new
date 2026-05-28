@@ -167,6 +167,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/diary',       [ProfileController::class, 'diary'])->name('diary');
     });
 
+    // report review
+    Route::post('/reviews/{review}/report', [BookReviewController::class, 'report'])->name('reviews.report');
     // Main Profile Catch-All (Garis finish terakhir)
     Route::get('/{user:username}', [ProfileController::class, 'show'])->name('profile');
 
