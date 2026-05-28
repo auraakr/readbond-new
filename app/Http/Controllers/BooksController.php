@@ -158,7 +158,7 @@ class BooksController extends Controller
     /**
      * Get recent reviews with book and user info
      */
-    private function getRecentReviews($limit = 6)
+    private function getRecentReviews($limit = 10)
     {
         return Cache::remember('recent_reviews', 1800, function () use ($limit) {
             return BookReview::with(['book', 'user'])
