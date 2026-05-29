@@ -53,7 +53,7 @@
                         <div class="aspect-[2/3] rounded-sm overflow-hidden bg-slate-800 mb-4 shadow-md group-hover:ring-1 group-hover:ring-purple-200 transition-all">
                             @if($book->cover)
                                 <img 
-                                    src="{{ $book->cover }}"
+                                    src="{{ $book->cover_url }}"
                                     alt="{{ $book->title }}"
                                     class="w-full h-full object-cover transition duration-500" 
                                 />
