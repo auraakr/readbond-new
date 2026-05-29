@@ -323,72 +323,96 @@
 
 {{-- ─── AUTOCOMPLETE SCRIPT ─── --}}
 <script>
-const input       = document.getElementById('search-input');
-const box         = document.getElementById('autocomplete-box');
-const autocompleteUrl = "{{ route('books.autocomplete') }}";
-let debounceTimer;
+    const input           = document.getElementById('search-input');
+    const box             = document.getElementById('autocomplete-box');
+    const autocompleteUrl = "{{ route('books.autocomplete') }}";
+    // Siapkan URL request buku dari Laravel Blade ke JavaScript
+    const requestBookUrl  = "{{ route('books.request') }}"; 
+    let debounceTimer;
 
-input.addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    const q = input.value.trim();
+    input.addEventListener('input', () => {
+        clearTimeout(debounceTimer);
+        const q = input.value.trim();
 
-    if (q.length < 2) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+        if (q.length < 2) { box.classList.add('hidden'); box.innerHTML = ''; return; }
 
-    debounceTimer = setTimeout(async () => {
-        try {
-            const res  = await fetch(`${autocompleteUrl}?q=${encodeURIComponent(q)}`);
-            const data = await res.json();
+        debounceTimer = setTimeout(async () => {
+            try {
+                const res  = await fetch(`${autocompleteUrl}?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
 
-            if (!data.length) { box.classList.add('hidden'); return; }
+                let htmlContent = '';
 
-            box.innerHTML = data.map(item => `
-                <a href="${item.url}"
-                    class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-700 transition text-left border-b border-slate-700/50 last:border-0">
-                    ${item.cover
-                        ? `<img src="${item.cover}" class="w-8 h-11 object-cover rounded shrink-0">`
-                        : `<div class="w-8 h-11 bg-slate-700 rounded shrink-0 flex items-center justify-center">...</div>`
-                    }
-                    <div class="overflow-hidden">
-                        <p class="text-white text-sm font-medium truncate">${item.title}</p>
-                        <p class="text-slate-400 text-xs truncate">${item.author}</p>
-                    </div>
-                </a>
-            `).join('');
+                if (data.length > 0) {
+                    // Skenario 1: Data ditemukan, loop data buku seperti biasa
+                    htmlContent += data.map(item => `
+                        <a href="${item.url}"
+                            class="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-700 transition text-left border-b border-slate-700/50">
+                            ${item.cover
+                                ? `<img src="${item.cover}" class="w-8 h-11 object-cover rounded shrink-0">`
+                                : `<div class="w-8 h-11 bg-slate-700 rounded shrink-0 flex items-center justify-center">...</div>`
+                            }
+                            <div class="overflow-hidden">
+                                <p class="text-white text-sm font-medium truncate">${item.title}</p>
+                                <p class="text-slate-400 text-xs truncate">${item.author}</p>
+                            </div>
+                        </a>
+                    `).join('');
+                } else {
+                    // Skenario 2: Data kosong, tampilkan pesan informatif
+                    htmlContent += `
+                        <div class="px-4 py-4 text-sm text-slate-500 text-center">
+                            Buku "${q}" tidak ditemukan.
+                        </div>
+                    `;
+                }
 
-            box.classList.remove('hidden');
-        } catch (e) {
-            console.error('Autocomplete error:', e);
+                // ─── TOMBOL AJUKAN BUKU (Selalu nempel di baris paling bawah) ───
+                htmlContent += `
+                    <a href="${requestBookUrl}" id="btn-request-book"
+                        class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-slate-900/60 hover:bg-purple-950/30 text-purple-400 hover:text-purple-300 text-xs font-semibold tracking-wide transition border-t border-slate-700/50 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        Tidak menemukan buku? Ajukan tambah buku!
+                    </a>
+                `;
+
+                box.innerHTML = htmlContent;
+                box.classList.remove('hidden');
+            } catch (e) {
+                console.error('Autocomplete error:', e);
+            }
+        }, 300);
+    });
+
+    // Tutup dropdown kalau klik di luar
+    document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !box.contains(e.target)) {
+            box.classList.add('hidden');
         }
-    }, 300);
-});
+    });
 
-// Tutup dropdown kalau klik di luar
-document.addEventListener('click', (e) => {
-    if (!input.contains(e.target) && !box.contains(e.target)) {
-        box.classList.add('hidden');
-    }
-});
+    // Navigasi keyboard (Disesuaikan agar tombol ajukan juga bisa diseleksi via panah)
+    input.addEventListener('keydown', (e) => {
+        const items = box.querySelectorAll('a');
+        const active = box.querySelector('a.bg-slate-700');
+        let idx = Array.from(items).indexOf(active);
 
-// Navigasi keyboard
-input.addEventListener('keydown', (e) => {
-    const items = box.querySelectorAll('a');
-    const active = box.querySelector('a.bg-slate-700');
-    let idx = Array.from(items).indexOf(active);
-
-    if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        if (active) active.classList.remove('bg-slate-700');
-        items[Math.min(idx + 1, items.length - 1)]?.classList.add('bg-slate-700');
-    } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        if (active) active.classList.remove('bg-slate-700');
-        items[Math.max(idx - 1, 0)]?.classList.add('bg-slate-700');
-    } else if (e.key === 'Enter' && active) {
-        e.preventDefault();
-        window.location.href = active.getAttribute('href'); // ✅
-    } else if (e.key === 'Escape') {
-        box.classList.add('hidden');
-    }
-});
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (active) active.classList.remove('bg-slate-700');
+            items[Math.min(idx + 1, items.length - 1)]?.classList.add('bg-slate-700');
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (active) active.classList.remove('bg-slate-700');
+            items[Math.max(idx - 1, 0)]?.classList.add('bg-slate-700');
+        } else if (e.key === 'Enter' && active) {
+            e.preventDefault();
+            window.location.href = active.getAttribute('href');
+        } else if (e.key === 'Escape') {
+            box.classList.add('hidden');
+        }
+    });
 </script>
 @endsection

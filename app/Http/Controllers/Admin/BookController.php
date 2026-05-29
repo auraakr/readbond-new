@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Book;
+use App\Models\BookRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,15 +18,22 @@ class BookController extends Controller
     }
 
     // Menampilkan form tambah buku
-    public function create()
+    public function create(Request $request)
     {
-        return view('admin.books.create');
+        $bookRequest = null;
+
+        // Jika admin datang dari halaman persetujuan book request
+        if ($request->has('request_id')) {
+            $bookRequest = BookRequest::findOrFail($request->request_id);
+        }
+
+        return view('admin.books.create', compact('bookRequest'));
     }
 
     // Menyimpan data buku baru ke database (Create)
     public function store(Request $request)
     {
-        $request->validate([
+        $validate = $request->validate([
             'title'         => 'required|string|max:255',
             'author_name'   => 'required|string|max:255',
             'year'          => 'required|integer',
@@ -47,6 +55,13 @@ class BookController extends Controller
         }
 
         \App\Models\Book::create($data);
+
+        if ($request->has('book_request_id')) {
+            $bookRequest = BookRequest::find($request->book_request_id);
+            if ($bookRequest) {
+                $bookRequest->update(['status' => 'approved']);
+            }
+        }
 
         return redirect()->route('admin.books.index')->with('success', 'Buku berhasil ditambahkan!');
     }

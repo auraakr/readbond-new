@@ -46,11 +46,17 @@
                     class="{{ request()->routeIs('admin.books.create') ? 'bg-purple-600 text-white' : 'text-slate-400 hover:bg-slate-800' }} flex items-center gap-3 px-4 py-3 rounded-lg transition">
                         <span>Add New Book</span>
                     </a>
+
+                    <!-- Link Add Book (Opsional jika ingin shortcut langsung) -->
+                    <a href="{{ route('admin.book-requests.index') }}" 
+                    class="{{ request()->routeIs('admin.book-requests.index') ? 'bg-purple-600 text-white' : 'text-slate-400 hover:bg-slate-800' }} flex items-center gap-3 px-4 py-3 rounded-lg transition">
+                        <span>Book Requests</span>
+                    </a>
                 </div>
             </div>
 
             <!-- Users Management -->
-            <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800' }} transition-colors">
+            <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-purple-600/20 text-purple-400 border border-purple-500/30' : 'text-slate-400 hover:text-white hover:bg-slate-800' }} transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 4H9m6 16H9m6-7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>

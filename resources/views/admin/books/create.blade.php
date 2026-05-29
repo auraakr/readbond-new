@@ -11,42 +11,48 @@
 
     <form action="{{ route('admin.books.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
         @csrf
+
+        {{-- Input hidden penanda jika formulir ini berasal dari persetujuan book request --}}
+        @if(isset($bookRequest))
+            <input type="hidden" name="book_request_id" value="{{ $bookRequest->id }}">
+        @endif
+
         <div class="bg-slate-900 border border-white/5 p-8 rounded-2xl space-y-6">
             {{-- Judul Buku --}}
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-2">Book Title</label>
-                <input type="text" name="title" required class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white" placeholder="The Great Gatsby">
+                <input value="{{ old('title', $bookRequest->title ?? '') }}" type="text" name="title" required class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white" placeholder="The Great Gatsby">
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- Author Name --}}
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-2">Author Name</label>
-                    <input type="text" name="author_name" required class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white">
+                    <input value="{{ old('author_name', $bookRequest->author_name ?? '') }}" type="text" name="author_name" required class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white">
                 </div>
                 {{-- Year --}}
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-2">Release Year</label>
-                    <input type="number" name="year" required class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white">
+                    <input value="{{ old('year', $bookRequest->year ?? '') }}" type="number" name="year" required class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white">
                 </div>
             </div>
 
             {{-- Description --}}
             <div>
                 <label class="block text-sm font-medium text-slate-300 mb-2">Description (Desc)</label>
-                <textarea name="desc" rows="4" class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white"></textarea>
+                <textarea name="desc" rows="4" class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white">{{ old('desc', $bookRequest->desc ?? '') }}</textarea>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {{-- Page Count --}}
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-2">Page Count</label>
-                    <input type="number" name="pageCount" class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white">
+                    <input value="{{ old('pageCount', $bookRequest->pageCount ?? '') }}" type="number" name="pageCount" class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white">
                 </div>
                 {{-- Subject (Kategori) --}}
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-2">Subject (Pisahkan dengan koma)</label>
-                    <input type="text" name="subject" class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white" placeholder="Fiction, Drama">
+                    <input value="{{ old('subject', $bookRequest->subject ? implode(', ', $bookRequest->subject) : '') }}" type="text" name="subject" class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white" placeholder="Fiction, Drama">
                 </div>
                 {{-- Cover --}}
                 <div>

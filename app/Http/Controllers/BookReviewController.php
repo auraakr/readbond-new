@@ -6,7 +6,7 @@ use App\Models\BookReview;
 use App\Models\ReviewReport;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Auth; // Tambahkan ini agar Auth:: terdeteksi
+use Illuminate\Support\Facades\Auth;
 
 class BookReviewController extends Controller
 {
