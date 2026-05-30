@@ -253,52 +253,150 @@
         </div>
     </section>
 
-    <!-- Social Proof Section -->
-    <section>
-        <div class="rb-section py-20 px-6 ">
-            <p class="rb-section-label">Testimonials</p>
-            <h2 class="rb-section-title" style="margin-bottom:40px;">What Readers Say</h2>
-    
-            <div class="rb-testimonials-grid">
-    
-                <div class="rb-testimonial">
-                    <div class="rb-testimonial__stars">★★★★★</div>
-                    <p class="rb-testimonial__quote">"Readbond has transformed how I track and share my reading. The interface is beautiful and so easy to use!"</p>
-                    <div class="rb-testimonial__author">
-                        <div class="rb-avatar" style="background:rgba(139,92,246,0.15);color:#8b5cf6;">SM</div>
-                        <div>
-                            <p class="rb-testimonial__name">Sarah Miller</p>
-                            <p class="rb-testimonial__role">Book Enthusiast</p>
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="rb-testimonial">
-                    <div class="rb-testimonial__stars">★★★★★</div>
-                    <p class="rb-testimonial__quote">"The book clubs feature is fantastic! I've found my reading community and discovered amazing recommendations."</p>
-                    <div class="rb-testimonial__author">
-                        <div class="rb-avatar" style="background:rgba(232,180,75,0.12);color:#e8b44b;">JC</div>
-                        <div>
-                            <p class="rb-testimonial__name">James Chen</p>
-                            <p class="rb-testimonial__role">Fiction Lover</p>
-                        </div>
-                    </div>
-                </div>
-    
-                <div class="rb-testimonial">
-                    <div class="rb-testimonial__stars">★★★★★</div>
-                    <p class="rb-testimonial__quote">"Finally, a reading platform that gets it. Beautiful design, powerful features, and a welcoming community."</p>
-                    <div class="rb-testimonial__author">
-                        <div class="rb-avatar" style="background:rgba(29,158,117,0.12);color:#1d9e75;">ER</div>
-                        <div>
-                            <p class="rb-testimonial__name">Emma Rodriguez</p>
-                            <p class="rb-testimonial__role">Mystery Reader</p>
-                        </div>
-                    </div>
-                </div>
-    
+    <!-- Popular Reviews Section -->
+    <section class="bg-slate-900 py-16 px-6 lg:px-32">
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <h2 class="text-3xl font-black text-white tracking-tight">Popular Reviews</h2>
+                <p class="text-slate-400 mt-2">Ulasan terpopuler dari komunitas pembaca</p>
             </div>
+            <a href="/books" class="text-purple-400 hover:text-purple-300 font-bold text-sm">View All →</a>
         </div>
+
+        @if($popularReviews->isEmpty())
+            <p class="text-slate-500 text-sm">Belum ada ulasan. Jadilah yang pertama!</p>
+        @else
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($popularReviews as $review)
+            <a href="{{ route('books.show', $review->book->external_id) }}"
+               class="group flex flex-col bg-slate-800 rounded-sm border border-slate-700 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all overflow-hidden">
+
+                {{-- Book header --}}
+                <div class="flex items-center gap-3 p-4 border-b border-slate-700">
+                    <div class="w-10 h-14 rounded-sm overflow-hidden bg-slate-700 shrink-0">
+                        @if($review->book && $review->book->cover_url)
+                            <img src="{{ $review->book->cover_url }}" alt="{{ $review->book->title }}"
+                                 class="w-full h-full object-cover">
+                        @else
+                            <div class="w-full h-full flex items-center justify-center text-slate-500">
+                                <x-heroicon-o-book-open class="w-4 h-4" />
+                            </div>
+                        @endif
+                    </div>
+                    <div class="min-w-0">
+                        <p class="text-white font-semibold text-sm truncate group-hover:text-purple-300 transition-colors">
+                            {{ $review->book->title ?? 'Unknown Book' }}
+                        </p>
+                        <p class="text-slate-500 text-xs truncate">{{ $review->book->author_name ?? '' }}</p>
+                        {{-- Stars --}}
+                        <div class="flex items-center gap-0.5 mt-1">
+                            @for($s = 1; $s <= 5; $s++)
+                                <span class="{{ $s <= $review->rating ? 'text-yellow-400' : 'text-slate-600' }} text-xs">★</span>
+                            @endfor
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Review body --}}
+                <div class="p-4 flex-1">
+                    <p class="text-slate-300 text-sm leading-relaxed line-clamp-4">{{ $review->review }}</p>
+                </div>
+
+                {{-- Reviewer footer --}}
+                <div class="px-4 pb-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        @if($review->user->avatar)
+                            <img src="{{ asset('storage/' . $review->user->avatar) }}"
+                                 class="w-7 h-7 rounded-full object-cover border border-slate-600">
+                        @else
+                            <div class="w-7 h-7 rounded-full bg-purple-600 flex items-center justify-center text-white text-[10px] font-bold border border-slate-600">
+                                {{ strtoupper(substr($review->user->name, 0, 1)) }}
+                            </div>
+                        @endif
+                        <span class="text-slate-400 text-xs">{{ $review->user->name }}</span>
+                    </div>
+                    <div class="flex items-center gap-1 text-slate-500 text-xs">
+                        <x-heroicon-o-heart class="w-3.5 h-3.5" />
+                        <span>{{ number_format($review->likes_count) }}</span>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+        @endif
+    </section>
+
+    <!-- Popular Collections Section -->
+    <section class="bg-slate-900 py-16 px-6 lg:px-32 border-t border-slate-800">
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <h2 class="text-3xl font-black text-white tracking-tight">Popular Collections</h2>
+                <p class="text-slate-400 mt-2">Book collections curated by our community</p>
+            </div>
+            <a href="/collections" class="text-purple-400 hover:text-purple-300 font-bold text-sm">View All →</a>
+        </div>
+
+        @if($popularCollections->isEmpty())
+            <p class="text-slate-500 text-sm">No popular collections found.</p>
+        @else
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @foreach($popularCollections as $collection)
+            @php $covers = $collection->books->pluck('cover_url')->filter()->values(); @endphp
+            <a href="/collections/{{ $collection->id }}"
+               class="group bg-slate-800 rounded-sm border border-slate-700 hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10 transition-all overflow-hidden flex flex-col">
+
+                {{-- Cover collage --}}
+                <div class="relative aspect-[16/9] bg-slate-700 overflow-hidden">
+                    @if($covers->count() >= 4)
+                        <div class="grid grid-cols-4 h-full">
+                            @foreach($covers->take(4) as $cover)
+                                <img src="{{ $cover }}" class="w-full h-full object-cover" alt="">
+                            @endforeach
+                        </div>
+                    @elseif($covers->count() >= 1)
+                        <img src="{{ $covers->first() }}" class="w-full h-full object-cover" alt="{{ $collection->title }}">
+                    @else
+                        <div class="w-full h-full flex items-center justify-center text-slate-500">
+                            <x-heroicon-o-rectangle-stack class="w-10 h-10" />
+                        </div>
+                    @endif
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent"></div>
+                    <div class="absolute bottom-3 left-3 right-3">
+                        <p class="text-white font-bold text-base leading-snug line-clamp-2 group-hover:text-purple-300 transition-colors">
+                            {{ $collection->title }}
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Meta --}}
+                <div class="p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        @if($collection->curator && $collection->curator->avatar)
+                            <img src="{{ asset('storage/' . $collection->curator->avatar) }}"
+                                 class="w-6 h-6 rounded-full object-cover border border-slate-600">
+                        @else
+                            <div class="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-white text-[10px] font-bold">
+                                {{ strtoupper(substr($collection->curator->name ?? 'U', 0, 1)) }}
+                            </div>
+                        @endif
+                        <span class="text-slate-400 text-xs">{{ $collection->curator->name ?? 'Unknown' }}</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-slate-500 text-xs">
+                        <span>{{ number_format($collection->books_count) }} books</span>
+                        <div class="flex items-center gap-1">
+                            <x-heroicon-o-heart class="w-3.5 h-3.5" />
+                            <span>{{ number_format($collection->likes_count) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                @if($collection->description)
+                <p class="px-4 pb-4 text-slate-500 text-xs line-clamp-2">{{ $collection->description }}</p>
+                @endif
+            </a>
+            @endforeach
+        </div>
+        @endif
     </section>
 
     <!-- CTA Section -->

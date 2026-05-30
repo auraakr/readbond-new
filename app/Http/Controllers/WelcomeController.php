@@ -2,6 +2,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
+use App\Models\BookReview;
+use App\Models\Collection;
 use App\Models\ReadingLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,6 +29,27 @@ class WelcomeController extends Controller
             return $response->json()['docs'] ?? [];
         });
 
+        $popularReviews = BookReview::with(['user', 'book'])
+            ->whereNotNull('review')
+            ->where('review', '!=', '')
+            ->withCount('likes')
+            ->orderBy('likes_count', 'desc')
+            ->latest()
+            ->limit(6)
+            ->get();
+
+        $popularCollections = Collection::with
+            ([
+                'curator',
+                'books',
+                'comments.author',
+                'comments.likes',
+            ])
+            ->withCount('books')
+            ->orderBy('likes_count', 'desc')
+            ->limit(6)
+            ->get();
+
         $friendsActivity = collect();
         if (Auth::check()) {
             $followingIds = Auth::user()->following()->pluck('users.id');
@@ -40,6 +63,6 @@ class WelcomeController extends Controller
             }
         }
 
-        return view('welcome', compact('popularBooks', 'mostReviewed', 'friendsActivity'));
+        return view('welcome', compact('popularBooks', 'mostReviewed', 'friendsActivity', 'popularReviews', 'popularCollections'));
     }
 }

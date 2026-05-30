@@ -88,9 +88,9 @@ class ProfileController extends Controller
         // Ambil maksimal 4 buku favorit milik pengguna
         $favoriteBooks = $user->favoriteBooks()->latest()->take(4)->get();
 
-    $isFollowed = auth()->check() 
-            ? $user->followers()->where('user_id', auth()->id())->exists() 
-            : false;
+        $isFollowed = auth()->check() 
+                ? $user->followers()->where('user_id', auth()->id())->exists() 
+                : false;
 
         return view('user.profile-edit', compact('user', 'favoriteBooks'));
     }
@@ -103,9 +103,10 @@ class ProfileController extends Controller
             'name'     => 'required|string|max:255',
             'username' => 'required|string|alpha_num|max:50|unique:users,username,' . $user->id,
             'avatar'   => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Batasi mimes agar aman
+            'bio'      => 'nullable|string|max:1000',
         ]);
 
-        $data = $request->only(['name', 'username']);
+        $data = $request->only(['name', 'username', 'bio']);
 
         // Handling Avatar Image (Mengikuti pola update buku kamu)
         if ($request->hasFile('avatar')) {

@@ -46,8 +46,9 @@
                 </div>
             </div>
 
-            {{-- Row 2: Form Fields --}}
-            <div class="bg-slate-900/40 border border-slate-800/80 rounded-sm p-6 space-y-5">
+            {{-- Row 2: Form Fields (Name, Username, Bio) --}}
+            {{-- Menggunakan x-data Alpine untuk menghitung batasan karakter bio --}}
+            <div x-data="{ bioText: '{{ old('bio', $user->bio ?? '') }}', maxBio: 160 }" class="bg-slate-900/40 border border-slate-800/80 rounded-sm p-6 space-y-5">
                 
                 {{-- Input Name --}}
                 <div>
@@ -68,6 +69,20 @@
                                class="w-full bg-slate-950 text-slate-200 text-sm border border-slate-800 rounded-sm pl-7 pr-3 py-2.5 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition">
                     </div>
                     @error('username')
+                        <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                {{-- Input Bio --}}
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <label for="bio" class="block text-xs font-bold uppercase tracking-wider text-slate-400">Bio</label>
+                        {{-- Karakter counter dinamis --}}
+                        <span class="text-[10px] font-mono text-slate-500" x-text="maxBio - bioText.length + ' characters left'"></span>
+                    </div>
+                    <textarea id="bio" name="bio" x-model="bioText" :maxlength="maxBio" rows="3" placeholder="Tulis sedikit tentang dirimu atau kutipan buku favoritmu..."
+                              class="w-full bg-slate-950 text-slate-200 text-sm border border-slate-800 rounded-sm px-3 py-2.5 outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition resize-none scrollbar-hide"></textarea>
+                    @error('bio')
                         <p class="text-xs text-red-400 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -251,6 +266,5 @@
             reader.readAsDataURL(file);
         }
     });
-
 </script>
 @endsection
