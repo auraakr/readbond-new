@@ -673,4 +673,23 @@ class ProfileController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    public function networks($username)
+    {
+        $user = User::where('username', $username)
+            ->withCount(['readingLogs as books_count' => function($query) {
+                $query->where('status', 'finished');
+            }])
+            ->withCount(['followers as followers_count', 'following as following_count'])
+            ->firstOrFail();
+
+        $followers = $user->followers()->latest()->get();
+        $following = $user->following()->latest()->get();
+
+        $isFollowed = auth()->check() 
+            ? $user->followers()->where('user_id', auth()->id())->exists() 
+            : false;
+
+        return view('user.profile-networks', compact('user', 'followers', 'following', 'isFollowed'));
+    }  
 }

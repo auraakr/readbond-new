@@ -173,6 +173,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/collections', [ProfileController::class, 'collections'])->name('collections');
         Route::get('/clubs',       [ProfileController::class, 'clubs'])->name('clubs');
         Route::get('/diary',       [ProfileController::class, 'diary'])->name('diary');
+        Route::get('/networks',     [ProfileController::class, 'networks'])->name('networks');
     });
 
     // Garis finish terakhir dari seluruh sistem routing web
