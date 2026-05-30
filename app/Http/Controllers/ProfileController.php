@@ -39,10 +39,10 @@ class ProfileController extends Controller
         $recentActivity = $this->getRecentActivity($user);
 
         // 3. Review Terbaru (untuk section terpisah)
-        $recentReviews = $user->readingLogs()
+        $recentReviews = $user->reviews()
             ->with('book')
-            ->whereNotNull('notes')
-            ->where('notes', '!=', '')
+            ->whereNotNull('review')
+            ->where('review', '!=', '')
             ->latest()
             ->limit(3)
             ->get();
@@ -526,10 +526,10 @@ class ProfileController extends Controller
 
     public function getAllReviews($user)
     {
-        return $user->readingLogs()
+        return $user->reviews()
             ->with('book')
-            ->whereNotNull('notes')
-            ->where('notes', '!=', '')
+            ->whereNotNull('review')
+            ->where('review', '!=', '')
             ->latest()
             ->get();
     }

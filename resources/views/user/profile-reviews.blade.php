@@ -37,7 +37,7 @@
                             <span class="text-xs {{ $s <= ($review->rating ?? 0) ? 'text-purple-400' : 'text-slate-700' }}">★</span>
                         @endfor
                     </div>
-                    <p class="text-sm text-slate-400 font-light leading-relaxed line-clamp-2">{{ $review->notes ?? '' }}</p>
+                    <p class="text-sm text-slate-400 font-light leading-relaxed line-clamp-2">{{ $review->review ?? '' }}</p>
                     <p class="text-[11px] text-slate-600 mt-2">{{ $review->likes_count ?? 0 }} likes</p>
                 </div>
             </div>

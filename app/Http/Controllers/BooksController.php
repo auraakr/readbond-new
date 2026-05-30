@@ -620,6 +620,8 @@ class BooksController extends Controller
                     ['user_id' => Auth::id(), 'book_id' => $book->id],
                     ['rating' => $request->rating]
                 );
+                // Update averageRating di tabel books
+                $book->recalculateRating();
             } else {
                 BookRating::where('user_id', Auth::id())->where('book_id', $book->id)->delete();
             }
