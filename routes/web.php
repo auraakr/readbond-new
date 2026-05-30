@@ -98,6 +98,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/{id}/like',              [BooksController::class, 'toggleLike'])->name('like');
         Route::post('/{id}/rate',              [BooksController::class, 'rate'])->name('rate');
         Route::post('/{id}/readlist',          [BooksController::class, 'toggleReadlist'])->name('readlist');
+        Route::get('/{id}/reading-log-data',   [BooksController::class, 'getReadingLog'])->name('reading-log-data');
         Route::post('/{id}/reading-log',       [BooksController::class, 'storeReadingLog'])->name('reading-log');
         Route::post('/{id}/add-to-collection', [BooksController::class, 'addToCollection'])->name('add-to-collection');
     });

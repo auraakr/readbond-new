@@ -534,6 +534,46 @@ class BooksController extends Controller
         return back();
     }
 
+    // ── Ambil Reading Log user untuk sebuah buku ──
+    public function getReadingLog($id)
+    {
+        if (!Auth::check()) {
+            return response()->json(null);
+        }
+
+        $book = is_numeric($id)
+            ? Book::find($id)
+            : Book::where('external_id', $id)->first();
+
+        if (!$book) {
+            return response()->json(null);
+        }
+
+        $log = ReadingLog::where('user_id', Auth::id())
+                         ->where('book_id', $book->id)
+                         ->first();
+
+        $review = null;
+        if ($log) {
+            $review = BookReview::where('user_id', Auth::id())
+                                ->where('book_id', $book->id)
+                                ->first();
+        }
+
+        return response()->json([
+            'log' => $log ? [
+                'status'      => $log->status,
+                'started_at'  => $log->started_at?->format('Y-m-d'),
+                'finished_at' => $log->finished_at?->format('Y-m-d'),
+            ] : null,
+            'review' => $review ? [
+                'rating'   => $review->rating,
+                'review'   => $review->review,
+                'is_liked' => $review->is_liked,
+            ] : null,
+        ]);
+    }
+
     // ── Simpan Reading Log ──
     public function storeReadingLog(Request $request, $id)
     {
@@ -563,8 +603,8 @@ class BooksController extends Controller
             ]
         );
 
-        // Save review if status is finished and has rating
-        if ($request->status === 'finished' && $request->rating) {
+        // Save review, rating, and like when status is finished
+        if ($request->status === 'finished') {
             BookReview::updateOrCreate(
                 ['user_id' => Auth::id(), 'book_id' => $book->id],
                 [
@@ -573,8 +613,24 @@ class BooksController extends Controller
                     'is_liked' => $request->boolean('is_liked', false),
                 ]
             );
-            
-            // --- PERBAIKAN: Hapus duplikasi pembersihan cache di sini ---
+
+            // Sync ke book_ratings
+            if ($request->rating) {
+                BookRating::updateOrCreate(
+                    ['user_id' => Auth::id(), 'book_id' => $book->id],
+                    ['rating' => $request->rating]
+                );
+            } else {
+                BookRating::where('user_id', Auth::id())->where('book_id', $book->id)->delete();
+            }
+
+            // Sync ke book_likes
+            if ($request->boolean('is_liked', false)) {
+                BookLike::firstOrCreate(['user_id' => Auth::id(), 'book_id' => $book->id]);
+            } else {
+                BookLike::where('user_id', Auth::id())->where('book_id', $book->id)->delete();
+            }
+
             Cache::forget('recent_reviews');
             Cache::forget('popular_reviews');
         }
