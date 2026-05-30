@@ -371,11 +371,36 @@
 
                         {{-- Like Button Interaction --}}
                         <div>
-                            {{-- Bagian tombol Like milikmu tetap di sini --}}
+                            @auth
+                                <button onclick="toggleLikeReview({{ $review['id'] }})" 
+                                        id="review-like-btn-{{ $review['id'] }}"
+                                        class="flex items-center gap-1.5 py-3 text-xs font-semibold transition
+                                        {{ $review['is_liked'] 
+                                            ? 'font-bold' 
+                                            : 'text-slate-400 hover:text-slate-300' }}">
+                                    <svg class="w-5 h-5 {{ $review['is_liked'] ? 'fill-current' : 'fill-none' }}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                    </svg>
+                                    <span id="review-like-count-{{ $review['id'] }}">{{ $review['likes_count'] ?? 0 }} Likes</span>
+                                </button>
+                            @else
+                                <a href="{{ route('login') }}" 
+                                    class="flex items-center gap-1.5 px-3 py-1.5 border text-slate-400 rounded-full text-xs hover:text-slate-300 transition">
+                                    <svg class="w-5 h-5 fill-none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                                    </svg>
+                                    <span>{{ $review['likes_count'] ?? 0 }} Likes</span>
+                                </a>
+                            @endauth
                         </div>
                     </div>
                 @empty
-                    {{-- Kondisi kosong --}}
+                    <div class="text-center py-10 text-slate-500">
+                        <svg class="w-12 h-12 mx-auto mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-sm">Belum ada review untuk buku ini.</p>
+                    </div>
                 @endforelse
             </div>
         </div>
