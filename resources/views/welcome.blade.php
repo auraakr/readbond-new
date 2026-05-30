@@ -3,7 +3,8 @@
 @section('title', 'Readbond - Welcome to Readbond')
 
 @section('content')
-    <!-- Hero Section -->
+    <!-- Hero Section — hanya untuk guest -->
+    @guest
     <div class="relative min-h-[600px] flex items-center justify-center overflow-hidden bg-slate-900 pt-16 pb-32">
         
         <div class="absolute inset-0 z-0 opacity-25 pointer-events-none">
@@ -35,8 +36,98 @@
             </div>
         </div>
     </div>
+    @endguest
 
-    <div class="bg-slate-900 py-20 px-6 lg:px-32">
+    {{-- ── Aktivitas Teman (hanya untuk user login) ── --}}
+    @auth
+    <div class="bg-slate-900 py-10 px-6 lg:px-32">
+        <h2 class="text-3xl font-black text-white tracking-tight">Welcome back, {{ Auth::user()->name }}! See what your friends are reading.</h2>
+        <p class="text-slate-400 mt-2">Here are the latest updates from your friends.</p>
+        <div class="grid grid-cols-2 py-4 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            @foreach($friendsActivity as $activity)
+            @php
+                $statusLabel = match($activity->status) {
+                    'reading' => 'Sedang membaca',
+                    'finished' => 'Selesai membaca',
+                    'want_to_read' => 'Ingin membaca',
+                };
+                $statusColor = match($activity->status) {
+                    'reading' => 'text-blue-400',
+                    'finished' => 'text-green-400',
+                    'want_to_read' => 'text-purple-400',
+                };
+            @endphp
+
+            <a href="{{ route('books.show', $activity->book->external_id) }}"
+            class="group aspect-[3/5] rounded-sm overflow-hidden border border-slate-700 bg-slate-800 transition-all hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/10">
+                <div class="relative w-full h-full">
+
+                    {{-- Book Cover as Background --}}
+                    @if($activity->book->cover_url)
+                        <img src="{{ $activity->book->cover_url }}" alt="{{ $activity->book->title }}"
+                            class="absolute inset-0 w-full h-full object-cover">
+                    @else
+                        <div class="absolute inset-0 w-full h-full flex items-center justify-center bg-slate-700 text-slate-500">
+                            <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.168 0.477 4 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332 0.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332 0.477-4 1.253"></path></svg>
+                        </div>
+                    @endif
+
+                    {{-- Gradient Overlays --}}
+                    {{-- Top gradient for user info --}}
+                    <div class="absolute inset-x-0 top-0 h-1/7 lg:h-1/5 bg-purple-600"></div>
+                    {{-- Bottom gradient for text readability --}}
+                    <div class="absolute inset-x-0 bottom-0 h-1/5 lg:h-1/4 bg-black/40"></div>
+
+                    {{-- Content Container --}}
+                    <div class="absolute inset-0 p-3 flex flex-col justify-between z-10">
+                        
+                        {{-- TOP: User Info Overlay --}}
+                        <div class="flex items-center gap-2">
+                            @if($activity->user->avatar)
+                                <img src="{{ asset('storage/' . $activity->user->avatar) }}"
+                                    class="w-6 h-6 rounded-full object-cover border border-slate-600 shrink-0">
+                            @else
+                                <div class="w-6 h-6 rounded-full bg-purple-600 flex items-center justify-center text-white text-[10px] font-bold shrink-0 border border-slate-600">
+                                    {{ strtoupper(substr($activity->user->name, 0, 1)) }}
+                                </div>
+                            @endif
+                            <span class="text-white text-xs font-medium truncate group-hover:text-purple-300 transition-colors">
+                                {{ $activity->user->name }}
+                            </span>
+                        </div>
+
+                        {{-- BOTTOM: Book Title and Status --}}
+                        <div class="space-y-1.5">
+                            {{-- Status Label and Time --}}
+                            <div class="flex items-center justify-between gap-2 text-[10px] font-medium {{ $statusColor }}">
+                                <span class="truncate">
+                                    {{ $statusLabel }}
+                                </span>
+                                <span class="text-slate-400 shrink-0">
+                                    {{ $activity->updated_at->diffForHumans(short: true) }}
+                                </span>
+                            </div>
+
+                            {{-- Book title --}}
+                            <h3 class="text-white text-sm font-semibold leading-snug line-clamp-1 group-hover:text-purple-200 transition-colors">
+                                {{ $activity->book->title }}
+                            </h3>
+                            
+                            {{-- Author (Optional) --}}
+                            {{-- @if($activity->book->author_name)
+                            <p class="text-slate-300 text-xs truncate">{{ $activity->book->author_name }}</p>
+                            @endif --}}
+                        </div>
+                    </div>
+
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+    @endauth
+
+    <div class="bg-slate-900 py-10 px-6 lg:px-32">
     
         <section class="mb-20">
             <div class="flex justify-between items-end mb-10">
