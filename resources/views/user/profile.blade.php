@@ -23,7 +23,7 @@
                     <p class="text-[10px] font-semibold uppercase tracking-widest text-slate-500 mb-4">Favorite Books</p>
                     <div class="grid grid-cols-4 gap-3">
                         @foreach($user->favoriteBooks ?? [] as $book)
-                        <a href="#" class="group block aspect-[3/5] rounded-sm overflow-hidden bg-slate-800 border border-white/5 hover:border-purple-500/50 transition">
+                        <a href="{{ route('books.show', $book->external_id) }}" class="group block aspect-[3/5] rounded-sm overflow-hidden bg-slate-800 border border-white/5 hover:border-purple-500/50 transition">
                             @if($book->cover)
                                 <img src="{{ $book->cover }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $book->title }}">
                             @else

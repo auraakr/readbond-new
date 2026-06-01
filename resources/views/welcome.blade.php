@@ -423,28 +423,26 @@
                     <p class="text-slate-400 text-sm">Your personal book companion for tracking and sharing reads.</p>
                 </div>
                 <div>
-                    <p class="font-semibold text-white mb-4">Product</p>
+                    <p class="font-semibold text-white mb-4">Quick Links</p>
                     <ul class="space-y-2 text-slate-400 text-sm">
-                        <li><a href="#" class="hover:text-purple-400 transition">Features</a></li>
-                        <li><a href="#" class="hover:text-purple-400 transition">Pricing</a></li>
-                        <li><a href="#" class="hover:text-purple-400 transition">Mobile App</a></li>
+                        <li><a href="/books" class="hover:text-purple-400 transition">Books</a></li>
+                        <li><a href="/collections" class="hover:text-purple-400 transition">Collections</a></li>
+                        <li><a href="/friends" class="hover:text-purple-400 transition">Friends</a></li>
+                        <li><a href="/book-clubs" class="hover:text-purple-400 transition">Book Clubs</a></li>
                     </ul>
                 </div>
                 <div>
-                    <p class="font-semibold text-white mb-4">Community</p>
+                    <p class="font-semibold text-white mb-4">Resources</p>
                     <ul class="space-y-2 text-slate-400 text-sm">
-                        <li><a href="#" class="hover:text-purple-400 transition">Book Clubs</a></li>
-                        <li><a href="#" class="hover:text-purple-400 transition">Forums</a></li>
-                        <li><a href="#" class="hover:text-purple-400 transition">Blog</a></li>
+                        <li><a href="/help" class="hover:text-purple-400 transition">Help Center</a></li>
+                        <li><a href="/terms" class="hover:text-purple-400 transition">Terms of Service</a></li>
+                        <li><a href="/privacy" class="hover:text-purple-400 transition">Privacy Policy</a></li>
                     </ul>
                 </div>
                 <div>
-                    <p class="font-semibold text-white mb-4">Legal</p>
-                    <ul class="space-y-2 text-slate-400 text-sm">
-                        <li><a href="#" class="hover:text-purple-400 transition">Privacy</a></li>
-                        <li><a href="#" class="hover:text-purple-400 transition">Terms</a></li>
-                        <li><a href="#" class="hover:text-purple-400 transition">Contact</a></li>
-                    </ul>
+                    <p class="font-semibold text-white mb-4">Contact Us</p>
+                    <p class="text-slate-400 text-sm">Have questions or feedback? We'd love to hear from you! <br><br>
+                    <a href="mailto:aura232kireina@gmail.com" class="hover:text-purple-400 transition"><span class="underline">Contact us via email</span></a>
                 </div>
             </div>
 

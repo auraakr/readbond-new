@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -202,5 +203,17 @@ class User extends Authenticatable
                     ->withPivot('order_position')
                     ->orderBy('book_user_favorites.order_position', 'asc')
                     ->withTimestamps();
+    }
+
+    protected function avatarUrl(): Attribute
+    {
+        return Attribute::get(function () {
+            if (!empty($this->avatar)) {
+                return filter_var($this->avatar, FILTER_VALIDATE_URL) 
+                    ? $this->avatar 
+                    : asset('storage/' . $this->avatar);
+            }
+            return null;
+        });
     }
 }

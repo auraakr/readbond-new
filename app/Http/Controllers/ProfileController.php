@@ -19,16 +19,13 @@ class ProfileController extends Controller
     {
         // 1. Ambil data user beserta count relasinya
         $user = User::where('username', $username)
+            ->with(['following'])
             ->withCount(['readingLogs as books_count' => function($query) {
                 $query->where('status', 'finished');
             }])
             ->withCount(['followers as followers_count', 'following as following_count'])
             ->withCount(['readingLists as readlist_count'])
             ->firstOrFail();
-
-        $user->avatar_url = !empty($user->avatar)
-            ? (filter_var($user->avatar, FILTER_VALIDATE_URL) ? $user->avatar : asset('storage/' . $user->avatar))
-            : null;
 
         // ── CEK STATUS FOLLOW (Apakah kita mem-follow user ini) ──
         $isFollowed = auth()->check() 
