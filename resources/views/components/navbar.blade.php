@@ -63,7 +63,6 @@
                                 </div>
 
                                 <a href="{{ route('profile', ['user' => auth()->user()->username]) }}" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">My Profile</a>
-                                <a href="/settings" class="block px-4 py-2 text-sm text-slate-300 hover:bg-slate-700 hover:text-white transition">Settings</a>
                                 
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf

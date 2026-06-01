@@ -41,7 +41,7 @@
     {{-- ── Aktivitas Teman (hanya untuk user login) ── --}}
     @auth
     <div class="bg-slate-900 py-10 px-6 lg:px-32">
-        <h2 class="text-3xl font-black text-white tracking-tight">Welcome back, {{ Auth::user()->name }}! See what your friends are reading.</h2>
+        <h2 class="text-3xl font-black text-white tracking-tight">Welcome back! See what your friends are reading.</h2>
         <p class="text-slate-400 mt-2">Here are the latest updates from your friends.</p>
         <div class="grid grid-cols-2 py-4 md:grid-cols-4 lg:grid-cols-6 gap-4">
             @foreach($friendsActivity as $activity)
