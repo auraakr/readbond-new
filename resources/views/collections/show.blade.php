@@ -31,7 +31,7 @@
                         @foreach($previewBooks as $book)
                             <div class="rounded-sm overflow-hidden bg-slate-700">
                                 @if($book->cover)
-                                    <img src="{{ $book->cover }}" alt="{{ $book->title }}"
+                                    <img src="{{ $book->cover_url }}" alt="{{ $book->title }}"
                                          class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center">
@@ -219,7 +219,7 @@
                                             transition-all duration-300
                                             group-hover:shadow-lg group-hover:shadow-purple-900/30">
                                     @if($book->cover)
-                                        <img src="{{ $book->cover }}" alt="{{ $book->title }}"
+                                        <img src="{{ $book->cover_url }}" alt="{{ $book->title }}"
                                              class="w-full h-full object-cover transition-transform
                                                     duration-500 group-hover:scale-105"
                                              loading="lazy">

@@ -9,7 +9,7 @@
     <div class="relative pt-20 pb-0 overflow-hidden">
         @if($book->cover)
             <div class="absolute inset-0 z-0"
-                 style="background-image: url('{{ $book->cover }}');
+                 style="background-image: url('{{ $book->cover_url }}');
                         background-size: cover; background-position: center;
                         filter: blur(40px) brightness(0.25); transform: scale(1.1);">
             </div>
@@ -26,7 +26,7 @@
                 <div class="w-44 lg:w-56 rounded-sm shadow-2xl shadow-black/60
                             overflow-hidden border border-white/10">
                     @if($book->cover)
-                        <img src="{{ $book->cover }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                        <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
                     @else
                         <div class="w-full h-full bg-slate-700 flex items-center justify-center text-slate-500">
                             <x-heroicon-o-book-open class="w-12 h-12" />
@@ -96,7 +96,7 @@
 
                     {{-- Reading Log --}}
                     @auth
-                        <button onclick="openReadingLogModalWithBook({{ $book->id }}, '{{ $book->external_id }}', '{{ addslashes($book->title) }}', '{{ addslashes($book->author_name) }}', '{{ $book->cover }}')"
+                        <button onclick="openReadingLogModalWithBook({{ $book->id }}, '{{ $book->external_id }}', '{{ addslashes($book->title) }}', '{{ addslashes($book->author_name) }}', '{{ $book->cover_url }}')"
                                 class="flex items-center gap-2 px-5 py-2.5 bg-purple-600 hover:bg-purple-500
                                        text-white text-sm font-semibold rounded-lg transition shadow-lg shadow-purple-900/40">
                             <x-heroicon-o-book-open class="w-4 h-4" />

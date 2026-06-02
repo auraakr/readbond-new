@@ -52,7 +52,7 @@
                 {{-- Subject (Kategori) --}}
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-2">Subject (Pisahkan dengan koma)</label>
-                    <input value="{{ old('subject', $bookRequest->subject ? implode(', ', $bookRequest->subject) : '') }}" type="text" name="subject" class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white" placeholder="Fiction, Drama">
+                    <input value="{{ old('subject', $bookRequest?->subject ? implode(', ', $bookRequest->subject) : '') }}" type="text" name="subject" class="w-full bg-slate-800 border border-white/10 rounded-lg px-4 py-2.5 text-white" placeholder="Fiction, Drama">
                 </div>
                 {{-- Cover --}}
                 <div>

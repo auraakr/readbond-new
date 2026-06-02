@@ -25,7 +25,10 @@ class BookController extends Controller
         // Jika admin datang dari halaman persetujuan book request
         if ($request->has('request_id')) {
             $bookRequest = BookRequest::findOrFail($request->request_id);
+        } else {
+            $bookRequest = null;
         }
+        
 
         return view('admin.books.create', compact('bookRequest'));
     }

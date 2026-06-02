@@ -65,7 +65,7 @@
                                         {{ $i > 2 ? 'hidden sm:block' : '' }}"
                                  style="{{ $i > 0 ? 'margin-left: -16px; z-index:'.($i).';' : '' }} position: relative; z-index: {{ 4 - $i }}">
                                 @if($b->cover)
-                                    <img src="{{ $b->cover }}" alt="{{ $b->title }}" class="w-full h-full object-cover">
+                                    <img src="{{ $b->cover_url }}" alt="{{ $b->title }}" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-slate-600">
                                         <svg class="w-8 h-8 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -144,7 +144,7 @@
                     @foreach($col->books->take(4) as $book)
                         <div class="bg-slate-700 rounded-sm flex items-center justify-center overflow-hidden">
                             @if($book->cover)
-                                <img src="{{ $book->cover }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
+                                <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="w-full h-full object-cover">
                             @else
                                 <svg class="w-5 h-5 text-slate-600 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
