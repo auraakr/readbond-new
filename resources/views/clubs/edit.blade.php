@@ -97,22 +97,24 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
                         <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Category</label>
+                        {{-- Bagian Category --}}
                         <select name="category" required 
                                 class="w-full bg-slate-800 text-slate-300 border border-slate-700 rounded-sm px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer transition">
-                            <option value="Just for fun" {{ $club->category == 'Just for fun' ? 'selected' : '' }}>Just for fun</option>
-                            <option value="Fan Club" {{ $club->category == 'Fan Club' ? 'selected' : '' }}>Fan Club</option>
-                            <option value="Romance" {{ $club->category == 'Romance' ? 'selected' : '' }}>Romance</option>
-                            <option value="Thriller" {{ $club->category == 'Thriller' ? 'selected' : '' }}>Thriller</option>
-                            <option value="Fantasy" {{ $club->category == 'Fantasy' ? 'selected' : '' }}>Fantasy</option>
+                            <option value="Just for fun" @selected(old('category', $club->category) == 'Just for fun')>Just for fun</option>
+                            <option value="Fan Club" @selected(old('category', $club->category) == 'Fan Club')>Fan Club</option>
+                            <option value="Romance" @selected(old('category', $club->category) == 'Romance')>Romance</option>
+                            <option value="Thriller" @selected(old('category', $club->category) == 'Thriller')>Thriller</option>
+                            <option value="Fantasy" @selected(old('category', $club->category) == 'Fantasy')>Fantasy</option>
                         </select>
                     </div>
 
                     <div>
                         <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Change book club visibility</label>
+                        {{-- Bagian Visibility --}}
                         <select name="visibility" required 
                                 class="w-full bg-slate-800 text-slate-300 border border-slate-700 rounded-sm px-4 py-2.5 text-sm outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer transition">
-                            <option value="public" {{ $club->visibility == 'public' ? 'selected' : '' }}>Public (This book club is currently public)</option>
-                            <option value="private" {{ $club->visibility == 'private' ? 'selected' : '' }}>Private (Invite only / Hidden space)</option>
+                            <option value="public" @selected(old('visibility', $club->visibility) == 'public')>Public (This book club is currently public)</option>
+                            <option value="private" @selected(old('visibility', $club->visibility) == 'private')>Private (Invite only / Hidden space)</option>
                         </select>
                     </div>
                 </div>
@@ -123,13 +125,13 @@
                 <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-4">Non moderator settings</p>
                 <div class="space-y-3.5">
                     <label class="flex items-center gap-3 cursor-pointer group text-slate-300 text-xs select-none">
-                        <input type="checkbox" name="allow_member_add_book" value="1" {{ $club->allow_member_add_book ? 'checked' : '' }}
+                        <input type="checkbox" name="allow_member_add_book" value="1" {{ old('allow_member_add_book', $club->allow_member_add_book) ? 'checked' : '' }}
                                class="rounded-sm border-slate-700 bg-slate-800 text-purple-600 focus:ring-purple-500 focus:ring-offset-slate-900 w-4 h-4 transition">
                         <span class="group-hover:text-slate-200 transition">Non-moderators can add club's book</span>
                     </label>
 
                     <label class="flex items-center gap-3 cursor-pointer group text-slate-300 text-xs select-none">
-                        <input type="checkbox" name="allow_member_add_discussion" value="1" {{ $club->allow_member_add_discussion ? 'checked' : '' }}
+                        <input type="checkbox" name="allow_member_add_discussion" value="1" {{ old('allow_member_add_discussion', $club->allow_member_add_discussion) ? 'checked' : '' }}
                                class="rounded-sm border-slate-700 bg-slate-800 text-purple-600 focus:ring-purple-500 focus:ring-offset-slate-900 w-4 h-4 transition">
                         <span class="group-hover:text-slate-200 transition">Non-moderators can add club's topic discussion</span>
                     </label>

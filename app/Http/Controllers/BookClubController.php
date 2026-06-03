@@ -21,7 +21,9 @@ class BookClubController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $clubs = $query->latest()->get();
+        $clubs = $query->latest()
+            ->where('visibility', 'public')
+            ->get();
 
         return view('clubs.index', compact('clubs'));
     }
@@ -176,13 +178,13 @@ class BookClubController extends Controller
             'description' => 'required|string',
             'category' => 'required|string',
             'visibility' => 'required|in:public,private',
+            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048', // Tambahkan validasi file agar aman
+            'allow_member_add_book' => 'nullable|boolean',
+            'allow_member_add_discussion' => 'nullable|boolean',
         ]);
 
-        if ($request->hasFile('cover_image')) {
-            $club->cover_image = $request->file('cover_image')->store('club_covers', 'public');
-        }
-
-        $club->update([
+        // 1. Tampung data text ke dalam array
+        $updateData = [
             'name' => $request->name,
             'description' => $request->description,
             'category' => $request->category,
@@ -190,7 +192,20 @@ class BookClubController extends Controller
             'visibility' => $request->visibility,
             'allow_member_add_book' => $request->has('allow_member_add_book'),
             'allow_member_add_discussion' => $request->has('allow_member_add_discussion'),
-        ]);
+        ];
+
+        // 2. Jika ada file cover baru, masukkan ke dalam array $updateData
+        if ($request->hasFile('cover_image')) {
+            // Opsional: Hapus cover lama dari storage jika ingin hemat penyimpanan
+            if ($club->cover_image) {
+                Storage::disk('public')->delete($club->cover_image);
+            }
+            
+            $updateData['cover_image'] = $request->file('cover_image')->store('club_covers', 'public');
+        }
+
+        // 3. Eksekusi update secara bersamaan
+        $club->update($updateData);
 
         return redirect()->route('clubs.show', $club->slug)->with('success', 'Pengaturan berhasil disimpan!');
     }

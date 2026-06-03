@@ -122,7 +122,7 @@
                                 @if($book->cover_image)
                                     <img src="{{ asset('storage/' . $book->cover_image) }}" class="absolute inset-0 w-full h-full object-cover">
                                 @elseif($book->cover) {{-- Fallback jika ada kolom external link cover --}}
-                                    <img src="{{ $book->cover }}" class="absolute inset-0 w-full h-full object-cover">
+                                    <img src="{{ $book->cover_url }}" class="absolute inset-0 w-full h-full object-cover">
                                 @endif
                             </div>
 

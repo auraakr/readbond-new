@@ -14,7 +14,8 @@ class BookClub extends Model
     protected $fillable = [
         'moderator_id', 'name', 'slug', 'description', 
         'category', 'rules', 'cover_image', 
-        'current_book_id', 'current_book_reason', 'current_book_finish_date'
+        'current_book_id', 'current_book_reason', 'current_book_finish_date',
+        'visibility', 'allow_member_to_add_book', 'allow_member_add_discussion'
     ];
 
     // Otomatis buat slug saat bikin club baru
